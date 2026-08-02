@@ -1,8 +1,8 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "rewrites": [
-    { "source": "/docs", "destination": "/" },
-    { "source": "/docs/", "destination": "/" },
-    { "source": "/docs/:path(.*)", "destination": "/:path" }
-  ]
+  "framework": null,
+  "buildCommand": "npm run build && rm -rf .static && mkdir -p .static/docs && cp -R out/. .static/docs/",
+  "outputDirectory": ".static",
+  "trailingSlash": true,
+  "redirects": [{ "source": "/", "destination": "/docs/", "permanent": false }]
 }
