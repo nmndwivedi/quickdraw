@@ -3,7 +3,7 @@ import {
   clamp, lerp, boundsUnion, boundsExpand, boundsContain, boundsIntersect,
   ptsBounds, rotWith, distToSegSq, distToPolyline, pointInPolygon,
   pointInEllipse, segIntersectsBounds, seededRand, wobblePolyline,
-  geoPolygon, ellipsePolygon,
+  geoPolygon, ellipsePolygon, cloudPolygon,
 } from '../src/geometry.js'
 
 describe('scalars', () => {
@@ -115,8 +115,24 @@ describe('geo polygon builders', () => {
     expect(geoPolygon('unknown', 10, 10).length).toBe(8) // falls back to rect
   })
 
+  it('cloudPolygon closes without a repeated point and scales with the box', () => {
+    const pts = cloudPolygon(100, 80)
+    expect(pts.length).toBeGreaterThan(40)
+    expect(pts.length % 2).toBe(0)
+    // the final curve lands back on the start, so it must not be emitted twice
+    const n = pts.length
+    expect(pts[n - 2] === pts[0] && pts[n - 1] === pts[1]).toBe(false)
+    // every sample scales linearly with the box
+    const big = cloudPolygon(200, 160)
+    for (let i = 0; i < pts.length; i++) expect(big[i]).toBeCloseTo(pts[i] * 2, 6)
+  })
+
+  it('geoPolygon routes cloud through cloudPolygon', () => {
+    expect(geoPolygon('cloud', 60, 40)).toEqual(cloudPolygon(60, 40))
+  })
+
   it('polygons stay inside their box', () => {
-    for (const kind of ['rectangle', 'triangle', 'diamond', 'hexagon', 'star']) {
+    for (const kind of ['rectangle', 'triangle', 'diamond', 'hexagon', 'star', 'cloud']) {
       const pts = geoPolygon(kind, 40, 30)
       for (let i = 0; i < pts.length; i += 2) {
         expect(pts[i]).toBeGreaterThanOrEqual(0)

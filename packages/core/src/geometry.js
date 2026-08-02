@@ -193,83 +193,46 @@ export const ellipsePolygon = (w, h, n = 32) => {
   return pts
 }
 
+// The cloud outline, as cubic Bézier segments in unit space (fractions of
+// w/h). One source of truth: cloudPolygon() samples these for hit-testing and
+// for the wobbled 'draw' path, while shapes.js strokes them directly for the
+// crisp dash styles — move the curve here and both follow.
+export const CLOUD_START = [0.15, 0.62]
+export const CLOUD_CURVES = [
+  // [c1x, c1y, c2x, c2y, endX, endY] — each picks up where the last ended
+  [0.02, 0.60, 0.02, 0.38, 0.16, 0.35],
+  [0.16, 0.15, 0.36, 0.10, 0.46, 0.20],
+  [0.54, 0.10, 0.74, 0.10, 0.82, 0.32],
+  [0.98, 0.32, 0.98, 0.58, 0.84, 0.60],
+  [0.82, 0.74, 0.66, 0.80, 0.55, 0.75],
+  [0.44, 0.70, 0.28, 0.78, 0.24, 0.68],
+  [0.22, 0.65, 0.18, 0.62, 0.15, 0.62],
+]
+
 // cloud sampled as a polygon (hit-testing / selection)
 export const cloudPolygon = (w, h, steps = 12) => {
-  const pts = []
-
-  // cubic Bézier sampler
-  const bezier = (p0, p1, p2, p3) => {
-    for (let i = 0; i <= steps; i++) {
+  let px = CLOUD_START[0] * w
+  let py = CLOUD_START[1] * h
+  const pts = [px, py]
+  for (const [c1x, c1y, c2x, c2y, ex, ey] of CLOUD_CURVES) {
+    const x1 = c1x * w, y1 = c1y * h
+    const x2 = c2x * w, y2 = c2y * h
+    const x3 = ex * w, y3 = ey * h
+    // start at i=1: t=0 is the previous segment's end, already in the list
+    for (let i = 1; i <= steps; i++) {
       const t = i / steps
       const mt = 1 - t
-
-      const x =
-        mt * mt * mt * p0.x +
-        3 * mt * mt * t * p1.x +
-        3 * mt * t * t * p2.x +
-        t * t * t * p3.x
-
-      const y =
-        mt * mt * mt * p0.y +
-        3 * mt * mt * t * p1.y +
-        3 * mt * t * t * p2.y +
-        t * t * t * p3.y
-
-      pts.push(x, y)
+      pts.push(
+        mt * mt * mt * px + 3 * mt * mt * t * x1 + 3 * mt * t * t * x2 + t * t * t * x3,
+        mt * mt * mt * py + 3 * mt * mt * t * y1 + 3 * mt * t * t * y2 + t * t * t * y3,
+      )
     }
+    px = x3
+    py = y3
   }
-
-  const p0 = { x: w * 0.15, y: h * 0.62 }
-
-  bezier(
-    p0,
-    { x: w * 0.02, y: h * 0.60 },
-    { x: w * 0.02, y: h * 0.38 },
-    { x: w * 0.16, y: h * 0.35 }
-  )
-
-  bezier(
-    { x: w * 0.16, y: h * 0.35 },
-    { x: w * 0.16, y: h * 0.15 },
-    { x: w * 0.36, y: h * 0.10 },
-    { x: w * 0.46, y: h * 0.20 }
-  )
-
-  bezier(
-    { x: w * 0.46, y: h * 0.20 },
-    { x: w * 0.54, y: h * 0.10 },
-    { x: w * 0.74, y: h * 0.10 },
-    { x: w * 0.82, y: h * 0.32 }
-  )
-
-  bezier(
-    { x: w * 0.82, y: h * 0.32 },
-    { x: w * 0.98, y: h * 0.32 },
-    { x: w * 0.98, y: h * 0.58 },
-    { x: w * 0.84, y: h * 0.60 }
-  )
-
-  bezier(
-    { x: w * 0.84, y: h * 0.60 },
-    { x: w * 0.82, y: h * 0.74 },
-    { x: w * 0.66, y: h * 0.80 },
-    { x: w * 0.55, y: h * 0.75 }
-  )
-
-  bezier(
-    { x: w * 0.55, y: h * 0.75 },
-    { x: w * 0.44, y: h * 0.70 },
-    { x: w * 0.28, y: h * 0.78 },
-    { x: w * 0.24, y: h * 0.68 }
-  )
-
-  bezier(
-    { x: w * 0.24, y: h * 0.68 },
-    { x: w * 0.22, y: h * 0.65 },
-    { x: w * 0.18, y: h * 0.62 },
-    p0
-  )
-
+  // the last curve lands back on the start point — drop it so the closed
+  // polygon has no zero-length edge
+  pts.length -= 2
   return pts
 }
 
