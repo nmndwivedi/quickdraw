@@ -61,7 +61,7 @@ const navbar = (
   <Navbar
     logo={logo}
     logoLink="https://tryquickdraw.com"
-    projectLink="https://github.com/nmndwivedi/quickdraw"
+    projectLink="https://github.com/quickdrawjs/quickdraw"
   >
     {npmLink}
   </Navbar>
@@ -76,7 +76,7 @@ const footer = (
     <span>
       MIT licensed. Built in the open —{' '}
       <a
-        href="https://github.com/nmndwivedi/quickdraw"
+        href="https://github.com/quickdrawjs/quickdraw"
         target="_blank"
         rel="noreferrer"
         style={footerLink}
@@ -124,7 +124,7 @@ export default async function RootLayout({ children }) {
           navbar={navbar}
           footer={footer}
           pageMap={await getPageMap()}
-          docsRepositoryBase="https://github.com/nmndwivedi/quickdraw/edit/main/apps/docs"
+          docsRepositoryBase="https://github.com/quickdrawjs/quickdraw/edit/main/apps/docs"
           editLink="Edit this page on GitHub"
           sidebar={{ defaultMenuCollapseLevel: 2 }}
         >

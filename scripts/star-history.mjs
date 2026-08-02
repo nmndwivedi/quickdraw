@@ -19,7 +19,7 @@ import { dirname, join } from 'node:path'
 import { buildStarChart } from '../apps/website/src/lib/starChart.js'
 import { renderStarSvg, THEMES, VIEW } from './lib/starSvg.mjs'
 
-const REPO = process.env.STAR_HISTORY_REPO ?? 'nmndwivedi/quickdraw'
+const REPO = process.env.STAR_HISTORY_REPO ?? 'quickdrawjs/quickdraw'
 const API = `https://api.github.com/repos/${REPO}`
 const OUT = join(dirname(fileURLToPath(import.meta.url)), '..', 'docs')
 const PER_PAGE = 100

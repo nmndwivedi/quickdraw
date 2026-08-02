@@ -93,7 +93,7 @@ useEffect(() => {
 <Quickdraw store={store} />
 ```
 
-See the [repository README](https://github.com/nmndwivedi/quickdraw) for the
+See the [repository README](https://github.com/quickdrawjs/quickdraw) for the
 full API.
 
 ## License

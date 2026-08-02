@@ -1,7 +1,7 @@
 // Sponsorship config — the single source of truth for tiers and the wall.
 // Payments run through GitHub Sponsors; if the platform ever changes, this
 // URL is the only thing to touch.
-export const SPONSOR_URL = 'https://github.com/sponsors/nmndwivedi'
+export const SPONSOR_URL = 'https://github.com/sponsors/quickdrawjs'
 
 // Highest tier first — every list on the site renders in this order.
 export const TIERS = [

@@ -107,7 +107,7 @@ Remote diffs don't enter local undo history, so collaborative undo stays sane.
 const blob = await editor.exportImage({ background: true, scale: 2 })
 ```
 
-See the [repository README](https://github.com/nmndwivedi/quickdraw) for the
+See the [repository README](https://github.com/quickdrawjs/quickdraw) for the
 full API, data model and guides.
 
 ## License

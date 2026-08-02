@@ -1,8 +1,8 @@
 blank_issues_enabled: true
 contact_links:
   - name: Question or idea
-    url: https://github.com/nmndwivedi/quickdraw/discussions
+    url: https://github.com/quickdrawjs/quickdraw/discussions
     about: Not a bug or a concrete feature request? Start a discussion.
   - name: Security issue
-    url: https://github.com/nmndwivedi/quickdraw/security/advisories/new
+    url: https://github.com/quickdrawjs/quickdraw/security/advisories/new
     about: Please report vulnerabilities privately, not as public issues.

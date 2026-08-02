@@ -108,7 +108,7 @@ not a knock on either project.
 - **You only need ink and enjoy building canvases:** perfect-freehand.
 - **The license cost is fine for your business:** tldraw remains excellent.
 
-Quickdraw is [open to contributions](https://github.com/nmndwivedi/quickdraw).
+Quickdraw is [open to contributions](https://github.com/quickdrawjs/quickdraw).
 If the missing feature that sent you back to a paid SDK is on the
-[roadmap](https://github.com/nmndwivedi/quickdraw/issues/1), tell us — or
+[roadmap](https://github.com/quickdrawjs/quickdraw/issues/1), tell us — or
 build it with us.

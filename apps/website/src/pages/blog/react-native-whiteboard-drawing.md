@@ -96,4 +96,4 @@ renderer (`@shopify/react-native-skia`) is the right tool — at the cost of
 building the whiteboard layer yourself. For a document-style whiteboard,
 notes app, or annotation feature, the WebView architecture is what ships.
 
-*Quickdraw is MIT-licensed and [open to contributions](https://github.com/nmndwivedi/quickdraw).*
+*Quickdraw is MIT-licensed and [open to contributions](https://github.com/quickdrawjs/quickdraw).*

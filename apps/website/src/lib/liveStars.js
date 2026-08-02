@@ -7,7 +7,7 @@
 //
 // Both fail soft — the page already shipped with build-time values baked in.
 
-const REPO = 'nmndwivedi/quickdraw'
+const REPO = 'quickdrawjs/quickdraw'
 const REPO_API = `https://api.github.com/repos/${REPO}`
 const SNAPSHOT = `https://raw.githubusercontent.com/${REPO}/main/docs/star-history.json`
 const COUNT_KEY = 'qd-star-count'

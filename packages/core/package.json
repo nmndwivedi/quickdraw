@@ -38,10 +38,10 @@
   "homepage": "https://tryquickdraw.com",
   "repository": {
     "type": "git",
-    "url": "https://github.com/nmndwivedi/quickdraw.git",
+    "url": "https://github.com/quickdrawjs/quickdraw.git",
     "directory": "packages/core"
   },
-  "bugs": "https://github.com/nmndwivedi/quickdraw/issues",
+  "bugs": "https://github.com/quickdrawjs/quickdraw/issues",
   "publishConfig": {
     "access": "public"
   }

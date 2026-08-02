@@ -137,18 +137,18 @@ the transport), no layers, no frames, and no rich text. Excalidraw and
 tldraw have years of production hardening and far bigger communities than a
 project released today.
 
-The [roadmap is public](https://github.com/nmndwivedi/quickdraw/issues/1).
+The [roadmap is public](https://github.com/quickdrawjs/quickdraw/issues/1).
 If the missing feature that sent you back to a paid SDK is on it — or
 isn't — say so there.
 
 ## Try it
 
 - **Live app, no signup:** [app.tryquickdraw.com](https://app.tryquickdraw.com)
-- **Repo:** [github.com/nmndwivedi/quickdraw](https://github.com/nmndwivedi/quickdraw)
+- **Repo:** [github.com/quickdrawjs/quickdraw](https://github.com/quickdrawjs/quickdraw)
 - **Docs:** [tryquickdraw.com](https://tryquickdraw.com)
 
 If you've embedded a whiteboard in production before, I'd genuinely like to
 know what you hit that I should handle better —
-[open an issue](https://github.com/nmndwivedi/quickdraw/issues) or start a
-[discussion](https://github.com/nmndwivedi/quickdraw/discussions). And if
+[open an issue](https://github.com/quickdrawjs/quickdraw/issues) or start a
+[discussion](https://github.com/quickdrawjs/quickdraw/discussions). And if
 it's useful to you, a star helps other people find it.

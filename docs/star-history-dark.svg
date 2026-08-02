@@ -9,7 +9,7 @@
   <rect x="0.5" y="0.5" width="799" height="309" rx="14" fill="#14130f" stroke="#2a2822"/>
   <g transform="translate(24 17) scale(0.75)"><path d="M12 1.6l3.1 6.7 7.3.9-5.4 5 1.4 7.2L12 17.8l-6.4 3.6L7 14.2 1.6 9.2l7.3-.9L12 1.6z" fill="#ffd154"/></g>
   <text x="47" y="33" fill="#f4f2ea" font-size="15" font-weight="700">20 stars</text>
-  <text x="776" y="33" fill="rgba(244, 242, 234, 0.5)" font-size="13" text-anchor="end">nmndwivedi/quickdraw</text>
+  <text x="776" y="33" fill="rgba(244, 242, 234, 0.5)" font-size="13" text-anchor="end">quickdrawjs/quickdraw</text>
   <line x1="56" x2="776" y1="266" y2="266" stroke="rgba(244, 242, 234, 0.13)" stroke-width="1" stroke-dasharray="3 6"/><line x1="56" x2="776" y1="165" y2="165" stroke="rgba(244, 242, 234, 0.13)" stroke-width="1" stroke-dasharray="3 6"/><line x1="56" x2="776" y1="64" y2="64" stroke="rgba(244, 242, 234, 0.13)" stroke-width="1" stroke-dasharray="3 6"/>
   <path d="M56 266 L111.5 255.9 L196.3 245.8 L202.9 235.7 L300.2 225.6 L302.2 215.5 L314.4 205.4 L394.8 195.3 L417.9 185.2 L451.7 175.1 L475.2 165 L543.8 154.9 L549.3 144.8 L587.2 134.7 L603.6 124.6 L634.8 114.5 L668.2 104.4 L708 94.3 L716 84.2 L723 74.1 L762 64 L776 64 L776 266 L56 266 Z" fill="url(#qd-star-fill)"/>
   <path d="M56 266 L111.5 255.9 L196.3 245.8 L202.9 235.7 L300.2 225.6 L302.2 215.5 L314.4 205.4 L394.8 195.3 L417.9 185.2 L451.7 175.1 L475.2 165 L543.8 154.9 L549.3 144.8 L587.2 134.7 L603.6 124.6 L634.8 114.5 L668.2 104.4 L708 94.3 L716 84.2 L723 74.1 L762 64 L776 64" fill="none" stroke="#ffd154" stroke-width="2.8" stroke-linejoin="round" stroke-linecap="round"/>

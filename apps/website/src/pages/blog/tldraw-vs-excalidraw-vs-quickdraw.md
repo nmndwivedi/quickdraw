@@ -71,7 +71,7 @@ The flip side of weight is capability: tldraw's shape and tool plugin
 system is the richest of the three, and Excalidraw ships years of
 accumulated features (component libraries, rich export options,
 localization). Quickdraw ships a complete but focused whiteboard; its
-[roadmap](https://github.com/nmndwivedi/quickdraw/issues/1) is public.
+[roadmap](https://github.com/quickdrawjs/quickdraw/issues/1) is public.
 
 ## Look and feel
 
@@ -97,7 +97,7 @@ board switches between light and dark themes.
 Be honest about this one: tldraw and Excalidraw have big communities, years
 of production hardening, and large test surfaces. Quickdraw is new —
 smaller API surface, ~120 tests, one engine shared across three packages,
-and an open [issue tracker](https://github.com/nmndwivedi/quickdraw/issues)
+and an open [issue tracker](https://github.com/quickdrawjs/quickdraw/issues)
 you can actually influence. Young projects earn trust in public; that's why
 everything is MIT on GitHub.
 
@@ -113,4 +113,4 @@ everything is MIT on GitHub.
 
 Corrections welcome — licensing and features change, and we'd rather this
 page be right than flattering:
-[open an issue](https://github.com/nmndwivedi/quickdraw/issues).
+[open an issue](https://github.com/quickdrawjs/quickdraw/issues).

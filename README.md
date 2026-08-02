@@ -1,6 +1,6 @@
 # Quickdraw
 
-[![CI](https://github.com/nmndwivedi/quickdraw/actions/workflows/ci.yml/badge.svg)](https://github.com/nmndwivedi/quickdraw/actions/workflows/ci.yml)
+[![CI](https://github.com/quickdrawjs/quickdraw/actions/workflows/ci.yml/badge.svg)](https://github.com/quickdrawjs/quickdraw/actions/workflows/ci.yml)
 [![npm: @quickdrawjs/core](https://img.shields.io/npm/v/@quickdrawjs/core?label=%40quickdrawjs%2Fcore&logo=npm)](https://www.npmjs.com/package/@quickdrawjs/core)
 [![npm: @quickdrawjs/react](https://img.shields.io/npm/v/@quickdrawjs/react?label=%40quickdrawjs%2Freact&logo=npm)](https://www.npmjs.com/package/@quickdrawjs/react)
 [![npm: @quickdrawjs/react-native](https://img.shields.io/npm/v/@quickdrawjs/react-native?label=%40quickdrawjs%2Freact-native&logo=npm)](https://www.npmjs.com/package/@quickdrawjs/react-native)
@@ -217,7 +217,7 @@ npm run typecheck # validate the published type declarations
 Quickdraw is young. What it doesn't have yet: a first-party multiplayer
 server (the diff-based store is sync-ready — you bring the transport),
 layers, frames, or rich text. The full roadmap lives in
-[issue #1](https://github.com/nmndwivedi/quickdraw/issues/1) — comment there
+[issue #1](https://github.com/quickdrawjs/quickdraw/issues/1) — comment there
 if the missing feature that sent you back to a paid SDK is on it (or isn't).
 
 ## Made with Quickdraw
@@ -244,7 +244,7 @@ the website:
 Quickdraw is free forever — no license fees, no upsell. If it saves you one, a
 star is how other developers find it.
 
-<a href="https://github.com/nmndwivedi/quickdraw/stargazers">
+<a href="https://github.com/quickdrawjs/quickdraw/stargazers">
   <picture>
     <source media="(prefers-color-scheme: dark)" srcset="docs/star-history-dark.svg">
     <source media="(prefers-color-scheme: light)" srcset="docs/star-history.svg">
@@ -260,8 +260,8 @@ same data as the chart on <a href="https://tryquickdraw.com/#support">the websit
 
 Quickdraw is open to contributions from everyone — bug reports, features,
 docs, examples. Start with [CONTRIBUTING.md](CONTRIBUTING.md), browse
-[`good first issue`](https://github.com/nmndwivedi/quickdraw/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22),
-or open a [discussion](https://github.com/nmndwivedi/quickdraw/discussions)
+[`good first issue`](https://github.com/quickdrawjs/quickdraw/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22),
+or open a [discussion](https://github.com/quickdrawjs/quickdraw/discussions)
 if you're not sure where a change belongs. We follow the
 [Contributor Covenant](CODE_OF_CONDUCT.md).
 

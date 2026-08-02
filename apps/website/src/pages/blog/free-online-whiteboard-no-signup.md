@@ -53,7 +53,7 @@ npm install @quickdrawjs/react
 ```
 
 The [docs](/docs/) take it from there, and the whole thing is
-[open source](https://github.com/nmndwivedi/quickdraw).
+[open source](https://github.com/quickdrawjs/quickdraw).
 
 ## Keyboard shortcuts worth knowing
 

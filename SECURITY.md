@@ -10,7 +10,7 @@ security fixes.
 Please **do not open a public issue** for security problems.
 
 Report privately via
-[GitHub Security Advisories](https://github.com/nmndwivedi/quickdraw/security/advisories/new)
+[GitHub Security Advisories](https://github.com/quickdrawjs/quickdraw/security/advisories/new)
 or email **promptifyapps@gmail.com**.
 
 You can expect an acknowledgment within a few days. Once a fix ships we'll

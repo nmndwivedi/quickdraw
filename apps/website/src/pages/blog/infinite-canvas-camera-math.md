@@ -117,7 +117,7 @@ working when zoomed" bugs.
 ## See it running
 
 All of this is implemented in
-[Quickdraw's editor](https://github.com/nmndwivedi/quickdraw), MIT-licensed
+[Quickdraw's editor](https://github.com/quickdrawjs/quickdraw), MIT-licensed
 — `editor.js` has the camera, `shapes.js` the hit-testing. If you'd rather
 not build the rest of the whiteboard (undo, selection, styles, export...),
 that's the [point of the SDK](/docs/):

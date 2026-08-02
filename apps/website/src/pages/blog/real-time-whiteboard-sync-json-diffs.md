@@ -102,8 +102,8 @@ audit trail of a board, stroke by stroke.
 
 ## Try it
 
-The [roadmap](https://github.com/nmndwivedi/quickdraw/issues/1) includes a
+The [roadmap](https://github.com/quickdrawjs/quickdraw/issues/1) includes a
 runnable two-browser sync example, and
-[issue #4](https://github.com/nmndwivedi/quickdraw/issues/4) is open if you'd
+[issue #4](https://github.com/quickdrawjs/quickdraw/issues/4) is open if you'd
 like to build it with us. Quickdraw is MIT-licensed:
-[github.com/nmndwivedi/quickdraw](https://github.com/nmndwivedi/quickdraw).
+[github.com/quickdrawjs/quickdraw](https://github.com/quickdrawjs/quickdraw).

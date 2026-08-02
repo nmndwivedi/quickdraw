@@ -124,4 +124,4 @@ deeper story — why diffs beat operational transforms for this use case — rea
 
 - [Documentation](/docs/) — persistence, headless mode, React Native
 - [Try the hosted app](https://app.tryquickdraw.com) — the same SDK, deployed
-- [GitHub](https://github.com/nmndwivedi/quickdraw) — MIT, open to contributions
+- [GitHub](https://github.com/quickdrawjs/quickdraw) — MIT, open to contributions
