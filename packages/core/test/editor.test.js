@@ -255,7 +255,7 @@ describe('text & notes', () => {
     expect(editor.store.shapes().length).toBe(1)
   })
 
-  it('notes get the note default color when pen is black', () => {
+  it('notes get the note default color when the pen is on the default ink', () => {
     editor.setTool('note')
     drag(editor, [[50, 50]])
     const note = editor.store.shapes().find((s) => s.type === 'note')

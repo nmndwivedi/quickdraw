@@ -14,6 +14,19 @@
   container-type: inline-size;
 }
 .qd-root[data-qd-theme='dark'] { background: #191713; }
+.qd-root { transition: background 320ms ease; }
+
+/* snapshot of the outgoing theme, faded out by the editor on setTheme() */
+.qd-theme-fade {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 20; /* over canvas + overlay, under the floating chrome */
+  pointer-events: none;
+  opacity: 1;
+  transition: opacity 320ms ease;
+}
 
 .qd-canvas, .qd-overlay {
   position: absolute;

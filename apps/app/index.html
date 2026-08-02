@@ -16,57 +16,65 @@
   <style>
     html, body { margin: 0; height: 100%; overscroll-behavior: none; }
     #board { position: fixed; inset: 0; }
-    /* The wordmark — quiet ink on the paper, top left, links home. */
+    /* Top-left chrome — the wordmark and the file bar share the dock's dark
+       glass, so every bar on the canvas stays dark in both themes. */
     .qd-app-logo {
-      position: fixed; left: 14px; top: 12px; z-index: 60;
+      position: fixed; left: 10px; top: 10px; z-index: 60;
       display: flex; align-items: center; gap: 8px;
-      font: 700 16px/1 ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+      font: 700 15.5px/1 ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
       letter-spacing: -0.01em;
-      color: #1c1b18; text-decoration: none;
-      padding: 6px 10px; border-radius: 10px;
+      color: rgba(255, 255, 255, 0.92); text-decoration: none;
+      padding: 8px 14px 8px 11px; border-radius: 999px;
+      background: rgba(19, 17, 13, 0.72);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      box-shadow: 0 4px 16px rgba(10, 8, 4, 0.25);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
       -webkit-tap-highlight-color: transparent;
-      transition: background 140ms ease, color 140ms ease;
+      transition: background 140ms ease;
     }
-    .qd-app-logo svg { width: 21px; height: 21px; display: block; }
-    .qd-app-logo:hover { background: rgba(28, 27, 24, 0.06); }
-    .qd-app-logo.dark { color: #f4f2ea; }
-    .qd-app-logo.dark:hover { background: rgba(244, 242, 234, 0.08); }
+    .qd-app-logo svg { width: 20px; height: 20px; display: block; }
+    .qd-app-logo:hover { background: rgba(19, 17, 13, 0.85); }
 
     /* File bar — files menu, new file, and the current file's name. */
     .qd-filebar {
-      position: fixed; left: 148px; top: 12px; z-index: 60;
+      position: fixed; left: 152px; top: 10px; z-index: 60;
       display: flex; align-items: center; gap: 2px;
+      padding: 4px 6px; border-radius: 999px;
       font: 500 14px/1 ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
-      color: #1c1b18;
-    }
-    .qd-filebar::before {
-      content: ''; width: 1px; height: 18px; background: rgba(28, 27, 24, 0.16);
-      margin-right: 8px;
+      color: rgba(255, 255, 255, 0.85);
+      background: rgba(19, 17, 13, 0.72);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      box-shadow: 0 4px 16px rgba(10, 8, 4, 0.25);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
     }
     .qd-file-btn {
       appearance: none; border: none; background: transparent; color: inherit;
       display: flex; align-items: center; justify-content: center;
-      width: 32px; height: 32px; border-radius: 9px; cursor: pointer;
+      width: 30px; height: 30px; border-radius: 999px; cursor: pointer;
       -webkit-tap-highlight-color: transparent;
       transition: background 140ms ease;
     }
     .qd-file-btn svg { width: 17px; height: 17px; display: block; }
-    .qd-file-btn:hover { background: rgba(28, 27, 24, 0.07); }
+    .qd-file-btn:hover { background: rgba(255, 255, 255, 0.1); }
     .qd-file-name {
       appearance: none; border: none; background: transparent; color: inherit;
       font: inherit; font-weight: 600; letter-spacing: -0.005em;
-      margin-left: 4px; padding: 7px 10px; border-radius: 9px;
+      margin-left: 2px; padding: 7px 10px; border-radius: 999px;
       min-width: 40px; max-width: 200px; cursor: text;
       transition: background 140ms ease;
     }
-    .qd-file-name:hover { background: rgba(28, 27, 24, 0.06); }
-    .qd-file-name:focus { outline: none; background: rgba(28, 27, 24, 0.08); }
+    .qd-file-name:hover { background: rgba(255, 255, 255, 0.08); }
+    .qd-file-name:focus { outline: none; background: rgba(255, 255, 255, 0.12); }
     .qd-files-menu {
-      position: fixed; left: 156px; top: 52px; z-index: 70;
+      position: fixed; left: 156px; top: 54px; z-index: 70;
       min-width: 230px; max-height: 60vh; overflow-y: auto;
-      background: #fff; color: #1c1b18;
-      border: 1px solid rgba(28, 27, 24, 0.12); border-radius: 12px;
-      box-shadow: 0 14px 40px -12px rgba(28, 27, 24, 0.3);
+      background: rgba(19, 17, 13, 0.85); color: rgba(255, 255, 255, 0.88);
+      border: 1px solid rgba(255, 255, 255, 0.14); border-radius: 13px;
+      box-shadow: 0 8px 28px rgba(10, 8, 4, 0.35);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
       padding: 6px;
     }
     .qd-files-menu[hidden] { display: none; }
@@ -75,35 +83,24 @@
       padding: 8px 10px; border-radius: 8px; cursor: pointer;
       font: 500 14px/1.2 inherit;
     }
-    .qd-file-row:hover { background: rgba(28, 27, 24, 0.06); }
+    .qd-file-row:hover { background: rgba(255, 255, 255, 0.1); }
     .qd-file-row .name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .qd-file-row.current .name { font-weight: 700; }
     .qd-file-row .dot { width: 6px; height: 6px; border-radius: 999px; background: transparent; flex: none; }
-    .qd-file-row.current .dot { background: #2f6fed; }
+    .qd-file-row.current .dot { background: #6285f5; }
     .qd-file-row .del {
       appearance: none; border: none; background: transparent; cursor: pointer;
-      color: rgba(28, 27, 24, 0.4); border-radius: 6px; flex: none;
+      color: rgba(255, 255, 255, 0.45); border-radius: 6px; flex: none;
       width: 22px; height: 22px; display: flex; align-items: center; justify-content: center;
       font: 600 14px/1 inherit; padding: 0;
     }
-    .qd-file-row .del:hover { color: #c0392b; background: rgba(192, 57, 43, 0.1); }
-
-    /* Dark theme follows the board, same as the logo. */
-    .dark .qd-filebar, .qd-filebar.dark { color: #f4f2ea; }
-    .qd-filebar.dark::before { background: rgba(244, 242, 234, 0.22); }
-    .qd-filebar.dark .qd-file-btn:hover,
-    .qd-filebar.dark .qd-file-name:hover { background: rgba(244, 242, 234, 0.09); }
-    .qd-filebar.dark .qd-file-name:focus { background: rgba(244, 242, 234, 0.12); }
-    .qd-files-menu.dark {
-      background: #262624; color: #f4f2ea; border-color: rgba(244, 242, 234, 0.14);
-      box-shadow: 0 14px 40px -12px rgba(0, 0, 0, 0.6);
-    }
-    .qd-files-menu.dark .qd-file-row:hover { background: rgba(244, 242, 234, 0.08); }
-    .qd-files-menu.dark .qd-file-row .del { color: rgba(244, 242, 234, 0.45); }
-    .qd-files-menu.dark .qd-file-row .del:hover { color: #ff7b6b; background: rgba(255, 123, 107, 0.14); }
+    .qd-file-row .del:hover { color: #ff7b6b; background: rgba(255, 123, 107, 0.14); }
 
     @media (max-width: 560px) {
-      .qd-filebar { left: 128px; }
+      /* the wordmark folds to its glyph so the file bar fits beside it */
+      .qd-app-logo { padding: 8px 11px; }
+      .qd-app-logo .logo-word { display: none; }
+      .qd-filebar { left: 60px; }
       .qd-file-name { max-width: 110px; }
       .qd-files-menu { left: 14px; }
     }
@@ -116,7 +113,7 @@
       <path d="M7 21 C7 12, 13 6.5, 20 7.5 C26.5 8.5, 27.5 16, 22 18.8 C17.5 21, 13 19.5, 14 15" stroke="currentColor" stroke-width="3" stroke-linecap="round" fill="none"/>
       <circle cx="24.5" cy="24.5" r="2.6" fill="#2f6fed"/>
     </svg>
-    Quickdraw
+    <span class="logo-word">Quickdraw</span>
   </a>
   <div class="qd-filebar" id="filebar">
     <button class="qd-file-btn" id="files-btn" type="button" title="Your files" aria-label="Your files" aria-haspopup="true" aria-expanded="false">

@@ -3,6 +3,7 @@ import Base from '../layouts/Base.astro'
 import CompareTable from '../components/CompareTable.astro'
 import StarButton from '../components/StarButton.astro'
 import StarHistory from '../components/StarHistory.astro'
+import Sponsors from '../components/Sponsors.astro'
 import { readStarHistory } from '../lib/starData.js'
 import { APP_URL, GITHUB_URL, SITE_URL } from '../consts.js'
 
@@ -285,6 +286,8 @@ createQuickdraw({
         </div>
       </div>
     </section>
+
+    <Sponsors />
 
     <section class="faq" id="faq">
       <h2>Questions people ask</h2>

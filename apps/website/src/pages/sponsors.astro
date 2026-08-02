@@ -1,0 +1,236 @@
+---
+// The full sponsor wall — uncapped, unlike the homepage section. This page
+// always exists so "too many sponsors for the homepage" is never a problem:
+// the homepage rolls overflow up into a "+N more" link that lands here.
+import Base from '../layouts/Base.astro'
+import { GITHUB_URL } from '../consts.js'
+import { SPONSOR_URL, TIERS, byTier, pastSponsors, activeSponsors } from '../lib/sponsors.js'
+
+const past = pastSponsors()
+const empty = activeSponsors().length === 0
+
+const steps = [
+  {
+    title: 'Pick a tier',
+    body: 'Sponsorship runs through GitHub Sponsors — a standard GitHub checkout, monthly or one-time, with receipts and invoices handled for you.',
+  },
+  {
+    title: 'Send your logo',
+    body: 'Open a PR adding yourself to sponsors.js (an SVG with a transparent background works best), or just open an issue and we’ll do it for you.',
+  },
+  {
+    title: 'You’re on the wall',
+    body: 'Your logo ships with the next deploy — on this page, the homepage, and (Gold and Silver) the README on GitHub and npm.',
+  },
+]
+---
+<Base
+  title="Sponsor Quickdraw — keep the whiteboard SDK MIT-licensed"
+  description="Sponsor Quickdraw and get your logo in front of the developers choosing a whiteboard SDK. Tiers from $5/mo, payments via GitHub Sponsors."
+>
+  <main>
+    <section class="hero">
+      <h1>Sponsor <span class="qd">Quickdraw</span></h1>
+      <p class="lede">
+        Quickdraw is MIT-licensed and free for commercial use, forever. There is
+        no paid tier waiting behind a curtain — sponsorship is the entire
+        business model. In return, your logo sits in front of every developer
+        who is actively choosing a whiteboard SDK.
+      </p>
+      <div class="actions">
+        <a class="btn primary" href={SPONSOR_URL} rel="noopener">Become a sponsor</a>
+        <a class="btn" href={GITHUB_URL} rel="noopener">Star the repo instead</a>
+      </div>
+    </section>
+
+    <section class="tiers">
+      <h2>Tiers</h2>
+      <div class="tier-grid">
+        {TIERS.map((t) => (
+          <div class="tier" style={`--c: ${t.hue}`}>
+            <div class="tier-head">
+              <h3>{t.name}</h3>
+              <span class="amount">{t.amount}</span>
+            </div>
+            <ul>
+              {t.perks.map((p) => (
+                <li>
+                  <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7"/></svg>
+                  {p}
+                </li>
+              ))}
+            </ul>
+            <a class="tier-cta" href={SPONSOR_URL} rel="noopener">Sponsor at {t.name} →</a>
+          </div>
+        ))}
+      </div>
+      <p class="fine-print">
+        One-time donations of any size are welcome too. Want something a tier
+        doesn't cover — a support arrangement, a feature bounty?
+        <a href={`${GITHUB_URL}/discussions`} rel="noopener">Start a discussion.</a>
+      </p>
+    </section>
+
+    <section class="wall-section">
+      <h2>The wall</h2>
+      {empty ? (
+        <div class="empty-wall">
+          <svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-7.5-4.6-9.5-9.2C1 8 3.2 4.6 6.8 4.6c2.2 0 3.9 1.2 5.2 3 1.3-1.8 3-3 5.2-3 3.6 0 5.8 3.4 4.3 7.2C19.5 16.4 12 21 12 21Z"/></svg>
+          <p class="empty-title">Nobody's here yet.</p>
+          <p>
+            Which means the first sponsors get the one thing money usually
+            can't buy on a sponsor wall: being first. Founding sponsors stay
+            marked as such for the life of the project.
+          </p>
+          <a class="btn primary" href={SPONSOR_URL} rel="noopener">Claim the first spot</a>
+        </div>
+      ) : (
+        <div class="full-wall">
+          {TIERS.map((t) => {
+            const list = byTier(t.id)
+            return list.length > 0 && (
+              <div class="tier-block">
+                <h3 class="tier-label" style={`--c: ${t.hue}`}>{t.name}</h3>
+                <div class={`row ${t.id}`}>
+                  {list.map((s) => (
+                    <a class={`chip ${t.id}`} href={s.url} rel="noopener sponsored" title={s.since ? `${s.name} — sponsor since ${s.since}` : s.name}>
+                      {s.logo ? <img src={s.logo} alt={s.name} loading="lazy" /> : <span class="chip-name">{s.name}</span>}
+                    </a>
+                  ))}
+                </div>
+              </div>
+            )
+          })}
+        </div>
+      )}
+      {past.length > 0 && (
+        <p class="past">
+          Past sponsors, with thanks:
+          {past.map((s, i) => (
+            <> <a href={s.url} rel="noopener">{s.name}</a>{i < past.length - 1 ? ',' : ''}</>
+          ))}
+        </p>
+      )}
+    </section>
+
+    <section class="how">
+      <h2>How it works</h2>
+      <ol class="steps">
+        {steps.map((s, i) => (
+          <li>
+            <span class="n">{i + 1}</span>
+            <div>
+              <h3>{s.title}</h3>
+              <p>{s.body}</p>
+            </div>
+          </li>
+        ))}
+      </ol>
+      <p class="fine-print">
+        Sponsorship never buys influence over the roadmap or the license —
+        Quickdraw stays MIT either way. Logos link with
+        <code>rel="sponsored"</code>, cancel anytime, and past sponsors are
+        acknowledged here permanently.
+      </p>
+    </section>
+  </main>
+</Base>
+
+<style>
+  main { max-width: var(--max); margin: 0 auto; padding: 0 20px 40px; }
+  section { margin-top: 72px; }
+  h2 { font-size: clamp(24px, 3.6vw, 30px); line-height: 1.2; margin: 0 0 22px; letter-spacing: -0.01em; }
+
+  .hero { margin-top: 56px; max-width: 640px; }
+  h1 { font-size: clamp(32px, 5vw, 46px); line-height: 1.12; margin: 0 0 16px; letter-spacing: -0.02em; }
+  .qd { color: var(--accent); }
+  .lede { font-size: 17px; color: var(--ink-soft); margin: 0 0 26px; text-wrap: pretty; }
+  .actions { display: flex; gap: 12px; flex-wrap: wrap; }
+  .btn {
+    display: inline-block; padding: 11px 22px; border-radius: 999px; font-weight: 600;
+    border: 1.5px solid var(--ink); color: var(--ink); font-size: 15.5px;
+  }
+  .btn:hover { text-decoration: none; background: var(--paper-2); }
+  .btn.primary { background: var(--ink); color: var(--paper); }
+  .btn.primary:hover { background: #000; }
+
+  .tier-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; }
+  .tier {
+    --c: var(--accent);
+    display: flex; flex-direction: column;
+    background: #fff; border: 1px solid var(--line); border-radius: var(--radius);
+    border-top: 3px solid color-mix(in srgb, var(--c) 70%, #fff);
+    padding: 20px 22px;
+  }
+  .tier-head { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; margin-bottom: 10px; }
+  .tier h3 { margin: 0; font-size: 18px; }
+  .amount { font-weight: 700; font-size: 15px; color: color-mix(in srgb, var(--c) 70%, var(--ink)); font-variant-numeric: tabular-nums; }
+  .tier ul { list-style: none; margin: 0 0 16px; padding: 0; flex: 1; }
+  .tier li {
+    display: flex; gap: 8px; align-items: baseline;
+    color: var(--ink-soft); font-size: 14.5px; line-height: 1.5; padding: 3px 0;
+  }
+  .tier li svg { flex: none; color: color-mix(in srgb, var(--c) 80%, var(--ink)); position: relative; top: 1px; }
+  .tier-cta { font-weight: 600; font-size: 14.5px; }
+
+  .empty-wall {
+    text-align: center; background: #fff; border: 1.5px dashed var(--line);
+    border-radius: var(--radius); padding: 44px 26px;
+  }
+  .empty-wall svg { color: color-mix(in srgb, var(--accent) 70%, var(--ink)); margin-bottom: 8px; }
+  .empty-title { font-weight: 700; font-size: 18px; margin: 0 0 8px; }
+  .empty-wall p { color: var(--ink-soft); max-width: 46ch; margin: 0 auto 20px; text-wrap: pretty; }
+  .empty-wall .empty-title { color: var(--ink); }
+
+  .tier-block + .tier-block { margin-top: 26px; }
+  .tier-label {
+    font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em;
+    color: color-mix(in srgb, var(--c) 65%, var(--ink)); margin: 0 0 10px;
+  }
+  .row { display: flex; flex-wrap: wrap; gap: 12px; }
+  .chip {
+    display: flex; align-items: center; justify-content: center;
+    border: 1px solid var(--line); border-radius: 12px; background: #fff;
+    padding: 0 22px; text-decoration: none;
+    transition: border-color 140ms ease, transform 140ms ease, box-shadow 140ms ease;
+  }
+  .chip:hover {
+    transform: translateY(-2px); text-decoration: none;
+    border-color: color-mix(in srgb, var(--accent) 40%, var(--line));
+    box-shadow: 0 12px 26px -18px rgba(28, 27, 24, 0.5);
+  }
+  .chip.gold { height: 92px; min-width: 220px; }
+  .chip.silver { height: 64px; min-width: 160px; }
+  .chip.backer { height: 44px; min-width: 0; padding: 0 16px; }
+  .chip img { max-height: 60%; max-width: 180px; object-fit: contain; display: block; }
+  .chip-name { font-weight: 700; color: var(--ink); letter-spacing: -0.01em; }
+  .chip.gold .chip-name { font-size: 17px; }
+  .chip.silver .chip-name { font-size: 15px; }
+  .chip.backer .chip-name { font-size: 13.5px; font-weight: 600; }
+  .past { margin-top: 26px; color: var(--ink-soft); font-size: 14px; }
+
+  .steps { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; }
+  .steps li {
+    display: flex; gap: 14px; align-items: flex-start;
+    background: #fff; border: 1px solid var(--line); border-radius: var(--radius);
+    padding: 18px 20px;
+  }
+  .steps .n {
+    flex: none; width: 28px; height: 28px; border-radius: 999px;
+    display: flex; align-items: center; justify-content: center;
+    background: var(--ink); color: var(--paper); font-weight: 700; font-size: 14px;
+  }
+  .steps h3 { margin: 2px 0 6px; font-size: 16px; }
+  .steps p { margin: 0; color: var(--ink-soft); font-size: 14.5px; line-height: 1.55; }
+
+  .fine-print { font-size: 13px; color: var(--ink-soft); margin-top: 14px; }
+
+  @media (max-width: 460px) {
+    .actions { display: grid; grid-template-columns: 1fr; gap: 10px; }
+    .btn { text-align: center; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .chip { transition: none; }
+    .chip:hover { transform: none; }
+  }
+</style>

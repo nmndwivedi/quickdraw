@@ -18,7 +18,7 @@ const RESIZE_CURSORS = {
   tl: 'nwse-resize', br: 'nwse-resize', tr: 'nesw-resize', bl: 'nesw-resize',
   t: 'ns-resize', b: 'ns-resize', l: 'ew-resize', r: 'ew-resize',
 }
-const DEFAULT_STYLES = { color: 'black', size: 'm', dash: 'draw', fill: 'none', font: 'draw' }
+const DEFAULT_STYLES = { color: 'blue', size: 'm', dash: 'draw', fill: 'none', font: 'draw' }
 
 export const TOOLS = ['select', 'hand', 'draw', 'highlight', 'eraser', 'laser', 'arrow', 'line', 'geo', 'text', 'note']
 
@@ -260,10 +260,40 @@ export class Editor {
   setTheme(id) {
     const t = themeOf(id)
     if (t === this.theme) return
+    this._crossfadeTheme()
     this.theme = t
     this.container.dataset.qdTheme = t.id
     this.requestRender()
     this.emit('theme')
+  }
+  // Freeze the outgoing theme as a bitmap over the board and fade it out, so
+  // a theme switch melts from one paper to the other instead of hard-cutting.
+  _crossfadeTheme() {
+    if (this._destroyed) return
+    if (typeof window !== 'undefined' &&
+        window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return
+    const w = this.canvas.width, h = this.canvas.height
+    if (!w || !h) return
+    try {
+      const snap = document.createElement('canvas')
+      snap.width = w
+      snap.height = h
+      snap.getContext('2d').drawImage(this.canvas, 0, 0)
+      snap.className = 'qd-theme-fade'
+      this._themeFade?.remove()
+      this._themeFade = snap
+      this.overlay.after(snap)
+      // two frames: one to paint at full opacity, one to start the transition
+      requestAnimationFrame(() => requestAnimationFrame(() => { snap.style.opacity = '0' }))
+      const done = () => {
+        snap.remove()
+        if (this._themeFade === snap) this._themeFade = null
+      }
+      snap.addEventListener('transitionend', done, { once: true })
+      setTimeout(done, 600) // safety net if transitionend never fires
+    } catch {
+      // a stubbed 2D context (tests, exotic embeds) just skips the fade
+    }
   }
   // 'none' | 'lines' | 'dots' — the backdrop behind the drawing
   setGrid(id) {
@@ -871,7 +901,7 @@ export class Editor {
     this.store.put({
       id, typeName: 'shape', type: 'note', x: p.x - NOTE_W / 2, y: p.y - NOTE_W / 2, rot: 0,
       z: this.store.maxZ() + 1,
-      props: { text: '', color: this.styles.color === 'black' ? 'yellow' : this.styles.color, size: 'm', font: this.styles.font, scale: 1 },
+      props: { text: '', color: this.styles.color === DEFAULT_STYLES.color ? 'yellow' : this.styles.color, size: 'm', font: this.styles.font, scale: 1 },
     })
     this.setTool('select')
     this.setSelection([id])
@@ -1818,6 +1848,8 @@ export class Editor {
   destroy() {
     this._destroyed = true
     this._commitText()
+    this._themeFade?.remove()
+    this._themeFade = null
     cancelAnimationFrame(this._raf)
     cancelAnimationFrame(this._camAnim)
     cancelAnimationFrame(this._fitEaseRaf || 0)

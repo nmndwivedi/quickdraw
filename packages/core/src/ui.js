@@ -481,7 +481,7 @@ export function buildUI(editor, { hidden = false, onSave, themeToggle = true, gr
     // the folded button wears the active tool so the state stays visible
     toolsBtn.innerHTML = ICONS[editor.tool === 'geo' ? editor.geoKind : editor.tool] || ICONS.select
     toolsBtn.classList.toggle('on', popover?.name === 'tools')
-    styleDot.style.background = editor.theme.colors[editor.currentStyles().color || 'black'].stroke
+    styleDot.style.background = editor.theme.colors[editor.currentStyles().color || 'blue'].stroke
     menuBtn.classList.toggle('on', popover?.name === 'menu')
     styleBtn.classList.toggle('on', popover?.name === 'styles')
     moreBtn.classList.toggle('on', popover?.name === 'more')

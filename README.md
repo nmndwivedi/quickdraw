@@ -220,6 +220,25 @@ layers, frames, or rich text. The full roadmap lives in
 [issue #1](https://github.com/nmndwivedi/quickdraw/issues/1) — comment there
 if the missing feature that sent you back to a paid SDK is on it (or isn't).
 
+## Made with Quickdraw
+
+Projects and products built on Quickdraw. Shipped something? **Add it here** —
+edit this table and open a PR (one row, alphabetical, ≤ 15-word description;
+see the [showcase guidelines](CONTRIBUTING.md#add-your-project-to-the-showcase)).
+
+| Project | Description |
+| --- | --- |
+| [tryquickdraw.com/app](https://app.tryquickdraw.com) | The official free whiteboard app — no account, autosaves locally. |
+| _Your project here_ | [Add yours →](CONTRIBUTING.md#add-your-project-to-the-showcase) |
+
+## Sponsors
+
+Quickdraw is MIT-licensed with no paid tier — [sponsors](https://tryquickdraw.com/sponsors/)
+are what keep it that way. Gold and Silver sponsors get their logo here and on
+the website:
+
+<a href="https://tryquickdraw.com/sponsors/"><i>No sponsors yet — your logo could be the first.</i></a>
+
 ## Star history
 
 Quickdraw is free forever — no license fees, no upsell. If it saves you one, a
