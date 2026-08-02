@@ -265,6 +265,21 @@ describe('snapshots', () => {
     expect(s.ids()).toEqual(['a'])
   })
 
+  it('loadSnapshot resets history — a document swap invalidates old undo/redo', () => {
+    const s = new Store()
+    s.put(shape('old'))
+    s.undo()
+    expect(s.canRedo).toBe(true)
+    s.put(shape('other'))
+    expect(s.canUndo).toBe(true)
+    let notified = 0
+    s.listenHistory(() => notified++)
+    s.loadSnapshot({ document: { store: { a: shape('a') } } })
+    expect(s.canUndo).toBe(false)
+    expect(s.canRedo).toBe(false)
+    expect(notified).toBeGreaterThan(0) // toolbars must hear about the reset
+  })
+
   it('clear empties the store (undoably for users)', () => {
     const s = new Store()
     s.put(shape('a'))

@@ -17,7 +17,7 @@ export { createBridge, encodeDispatch } from './bridge.js'
  *
  * props:
  *   theme        'light' | 'dark' (live-switchable)
- *   grid         'none' | 'lines' | 'dots' — the backdrop (live-switchable)
+ *   grid         'none' | 'lines' | 'ruled' | 'dots' | 'crosses' | 'iso' — the backdrop (live-switchable)
  *   readonly     lock input (also hides the toolbar)
  *   hideUi       hide the stock toolbar
  *   themeToggle  show the theme switch in the board menu (default true)
@@ -44,7 +44,7 @@ export { createBridge, encodeDispatch } from './bridge.js'
 export const Quickdraw = forwardRef(function Quickdraw(props, ref) {
   const {
     theme = 'light',
-    grid = 'none',
+    grid = 'lines',
     readonly = false,
     hideUi = false,
     themeToggle = true,

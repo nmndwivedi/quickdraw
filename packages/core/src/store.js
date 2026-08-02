@@ -221,6 +221,13 @@ export class Store {
       this.remove(this.ids(), source)
       for (const rec of Object.values(recs)) if (rec && rec.id) this.put(rec, source)
     }, source)
+    // this is a document swap, not an edit: history built against the old
+    // document is invalid (its diffs reference records that no longer exist),
+    // and stale canUndo/canRedo would leave toolbars lit on a fresh board
+    this.undos.length = 0
+    this.redos.length = 0
+    this._batch = null
+    this._notifyHistory()
   }
 
   clear(source = 'user') {

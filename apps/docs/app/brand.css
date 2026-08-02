@@ -18,6 +18,16 @@ html.light aside {
   --nextra-bg: 250, 248, 244;
 }
 
+/* npm mark in the navbar, matching the GitHub icon's hover feel */
+.qd-npm-link {
+  display: flex;
+  align-items: center;
+  transition: opacity 0.15s;
+}
+.qd-npm-link:hover {
+  opacity: 0.75;
+}
+
 /* slightly rounder code blocks, matching the marketing site */
 .nextra-code pre {
   border-radius: 12px;

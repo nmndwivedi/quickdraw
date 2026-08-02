@@ -163,6 +163,24 @@ const features = [
       </div>
       <div class="board-frame">
         <div id="hero-board" aria-label="Live Quickdraw whiteboard — draw here"></div>
+        <div id="hero-hint" aria-hidden="true">
+          <div class="hint-stage">
+            <div class="hint-doodle-wrap">
+            <svg class="hint-doodle" viewBox="0 0 220 90" width="220" height="90" fill="none" aria-hidden="true">
+              <path
+                class="hint-squiggle"
+                pathLength="1"
+                d="M18 62 C 40 18, 62 18, 78 50 C 92 78, 110 78, 124 50 C 138 22, 158 22, 172 44 C 182 60, 194 62, 204 52"
+                stroke="var(--accent, #e8590c)" stroke-width="4" stroke-linecap="round" />
+            </svg>
+            <svg class="hint-hand" viewBox="0 0 24 24" width="34" height="34" fill="none" stroke="var(--ink, #1c1b18)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z" fill="rgba(255,255,255,0.92)"/>
+              <path d="m15 5 4 4"/>
+            </svg>
+            </div>
+            <span class="hint-pill">Draw something!</span>
+          </div>
+        </div>
       </div>
     </section>
 
@@ -198,7 +216,7 @@ const features = [
 import '@quickdrawjs/core/quickdraw.css'
 
 export default function Board() {
-  return <Quickdraw theme="light" grid="dots" />
+  return <Quickdraw theme="light" grid="lines" />
 }`}</code></pre>
           </div>
           <div class="qs-pane" data-qs-pane="js">
@@ -312,11 +330,18 @@ createQuickdraw({
 
   const container = document.getElementById('hero-board')
   if (container) {
-    const board = createQuickdraw({ container, theme: 'light', grid: 'dots' })
+    const board = createQuickdraw({ container, theme: 'light', grid: 'lines' })
     const { store } = board.editor
     const saved = sessionStorage.getItem('qd-hero')
     if (saved) {
       try { store.loadSnapshot(JSON.parse(saved), 'remote') } catch {}
+    }
+    // "draw something" nudge: only over an untouched board, gone at first touch
+    const hint = document.getElementById('hero-hint')
+    if (hint) {
+      const hide = () => hint.classList.add('off')
+      if (store.shapes().length > 0) hide()
+      else container.addEventListener('pointerdown', hide, { once: true })
     }
     let t
     store.listen(() => {
@@ -412,6 +437,67 @@ createQuickdraw({
     border: 1.5px solid var(--line);
     box-shadow: 0 24px 60px -28px rgba(28, 27, 24, 0.28);
     overflow: hidden; background: #fff;
+  }
+  #hero-hint {
+    position: absolute; inset: 0; z-index: 5;
+    display: flex; align-items: center; justify-content: center;
+    pointer-events: none;
+  }
+  #hero-hint.off { display: none; }
+  .hint-stage {
+    position: relative;
+    display: flex; flex-direction: column; align-items: center; gap: 2px;
+  }
+  /* the wrap is exactly the SVG's box, so the hand's offset-path (element
+     coordinates) and the squiggle (SVG viewBox) share one origin */
+  .hint-doodle-wrap { position: relative; width: 220px; height: 90px; }
+  .hint-doodle { overflow: visible; display: block; }
+  .hint-squiggle {
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+    animation: hint-draw 3.2s ease-in-out infinite;
+  }
+  .hint-hand {
+    position: absolute; top: 0; left: 0;
+    /* same curve as .hint-squiggle, so the pencil tip rides the line */
+    offset-path: path('M18 62 C 40 18, 62 18, 78 50 C 92 78, 110 78, 124 50 C 138 22, 158 22, 172 44 C 182 60, 194 62, 204 52');
+    offset-rotate: 0deg;
+    /* offset-path anchors the glyph CENTER to the curve (Chrome has no
+       offset-anchor), so shift the box until the pencil tip — bottom-left
+       of the glyph — is what touches the line */
+    transform: translate(14px, -14px);
+    animation: hint-trace 3.2s ease-in-out infinite;
+    filter: drop-shadow(0 3px 4px rgba(28, 27, 24, 0.25));
+  }
+  @supports not (offset-path: path('M0 0 L1 1')) {
+    .hint-hand { display: none; }
+  }
+  .hint-pill {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 9px 16px; border-radius: 999px;
+    background: rgba(255, 255, 255, 0.9);
+    border: 1.5px dashed color-mix(in srgb, var(--accent) 55%, transparent);
+    box-shadow: 0 10px 26px -14px rgba(28, 27, 24, 0.35);
+    backdrop-filter: blur(4px);
+    color: var(--ink); font-weight: 600; font-size: 14.5px;
+  }
+  /* line and pen share the same fade window (74–90%) so they vanish together */
+  @keyframes hint-draw {
+    0% { stroke-dashoffset: 1; opacity: 1; }
+    62% { stroke-dashoffset: 0; opacity: 1; }
+    74% { stroke-dashoffset: 0; opacity: 1; }
+    90%, 100% { stroke-dashoffset: 0; opacity: 0; }
+  }
+  @keyframes hint-trace {
+    0% { offset-distance: 0%; opacity: 0; }
+    6% { opacity: 1; }
+    62% { offset-distance: 100%; opacity: 1; }
+    74% { offset-distance: 100%; opacity: 1; }
+    90%, 100% { offset-distance: 100%; opacity: 0; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .hint-squiggle { animation: none; stroke-dashoffset: 0; }
+    .hint-hand { animation: none; offset-distance: 100%; }
   }
 
   .features .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(270px, 1fr)); gap: 18px; }

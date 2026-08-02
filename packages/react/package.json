@@ -1,6 +1,6 @@
 {
   "name": "@quickdrawjs/react",
-  "version": "0.1.3",
+  "version": "0.2.0",
   "description": "React component for Quickdraw — the MIT-licensed infinite-canvas whiteboard SDK.",
   "type": "module",
   "main": "./src/index.js",
@@ -30,7 +30,7 @@
     "excalidraw-alternative"
   ],
   "dependencies": {
-    "@quickdrawjs/core": "0.1.3"
+    "@quickdrawjs/core": "0.2.0"
   },
   "peerDependencies": {
     "react": ">=17"

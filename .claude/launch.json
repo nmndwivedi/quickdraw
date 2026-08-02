@@ -18,12 +18,10 @@
       "runtimeArgs": [
         "run",
         "dev",
-        "--workspace=quickdraw-website",
-        "--",
-        "--port",
-        "4399"
+        "--workspace=quickdraw-website"
       ],
-      "port": 4399
+      "port": 4399,
+      "autoPort": true
     },
     {
       "name": "app",

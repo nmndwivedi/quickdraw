@@ -1,7 +1,9 @@
 # Quickdraw
 
 [![CI](https://github.com/nmndwivedi/quickdraw/actions/workflows/ci.yml/badge.svg)](https://github.com/nmndwivedi/quickdraw/actions/workflows/ci.yml)
-[![npm](https://img.shields.io/npm/v/@quickdrawjs/core?label=%40quickdrawjs%2Fcore)](https://www.npmjs.com/package/@quickdrawjs/core)
+[![npm: @quickdrawjs/core](https://img.shields.io/npm/v/@quickdrawjs/core?label=%40quickdrawjs%2Fcore&logo=npm)](https://www.npmjs.com/package/@quickdrawjs/core)
+[![npm: @quickdrawjs/react](https://img.shields.io/npm/v/@quickdrawjs/react?label=%40quickdrawjs%2Freact&logo=npm)](https://www.npmjs.com/package/@quickdrawjs/react)
+[![npm: @quickdrawjs/react-native](https://img.shields.io/npm/v/@quickdrawjs/react-native?label=%40quickdrawjs%2Freact-native&logo=npm)](https://www.npmjs.com/package/@quickdrawjs/react-native)
 [![license: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
 **The MIT-licensed infinite-canvas whiteboard SDK.** Drop a complete,

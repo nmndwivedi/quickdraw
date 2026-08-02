@@ -13,7 +13,7 @@ export * from '@quickdrawjs/core'
  *
  * props:
  *   theme        'light' | 'dark' (live-switchable)
- *   grid         'none' | 'lines' | 'dots' — the backdrop (live-switchable)
+ *   grid         'none' | 'lines' | 'ruled' | 'dots' | 'crosses' | 'iso' — the backdrop (live-switchable)
  *   readonly     lock input (also hides the toolbar)
  *   hideUi       hide the stock toolbar (bring your own chrome)
  *   themeToggle  show the theme switch in the board menu (default true)
@@ -37,7 +37,7 @@ export * from '@quickdrawjs/core'
 export const Quickdraw = forwardRef(function Quickdraw(props, ref) {
   const {
     theme = 'light',
-    grid = 'none',
+    grid = 'lines',
     readonly = false,
     hideUi = false,
     themeToggle = true,

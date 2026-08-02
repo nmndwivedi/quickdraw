@@ -32,11 +32,11 @@ const bendMidpoint = (pr) => {
 }
 
 export class Editor {
-  constructor({ container, store, theme = 'light', grid = 'none', readonly = false, camera, styles, geoKind } = {}) {
+  constructor({ container, store, theme = 'light', grid = 'lines', readonly = false, camera, styles, geoKind } = {}) {
     this.container = container
     this.store = store || new Store()
     this.theme = themeOf(theme)
-    this.grid = GRID_IDS.includes(grid) ? grid : 'none'
+    this.grid = GRID_IDS.includes(grid) ? grid : 'lines'
     this.readonly = !!readonly
     this.camera = camera || { x: 0, y: 0, z: 1 }
     this.styles = { ...DEFAULT_STYLES, ...(styles || {}) }
@@ -1515,7 +1515,8 @@ export class Editor {
   // W/H are device px; the ctx must be untransformed.
   _drawGrid(ctx, cam, W, H, dpr) {
     if (this.grid === 'none' || !(cam.z > 0)) return
-    const g = this.theme.grid?.[this.grid === 'dots' ? 'dot' : 'line']
+    // point-like marks (dots, crosses) carry less ink, so they use the darker ramp
+    const g = this.theme.grid?.[['dots', 'crosses'].includes(this.grid) ? 'dot' : 'line']
     if (!g) return
     let step = GRID_STEP
     while (step * cam.z < 18) step *= 2
@@ -1532,32 +1533,75 @@ export class Editor {
     for (let m = m0, y = (m0 * step + cam.y) * z; y <= H; m++, y += step * z) rows.push([y, isMajor(m)])
 
     ctx.save()
-    if (this.grid === 'lines') {
+    if (this.grid === 'lines' || this.grid === 'ruled') {
       for (const major of [false, true]) {
         ctx.beginPath()
         // half-pixel offsets keep a 1px rule on one device pixel, not two
-        for (const [x, m] of cols) if (m === major) { const p = Math.round(x) + 0.5; ctx.moveTo(p, 0); ctx.lineTo(p, H) }
+        if (this.grid === 'lines') {
+          for (const [x, m] of cols) if (m === major) { const p = Math.round(x) + 0.5; ctx.moveTo(p, 0); ctx.lineTo(p, H) }
+        }
         for (const [y, m] of rows) if (m === major) { const p = Math.round(y) + 0.5; ctx.moveTo(0, p); ctx.lineTo(W, p) }
         ctx.strokeStyle = major ? g.major : g.minor
         ctx.globalAlpha = fade
         ctx.lineWidth = 1
         ctx.stroke()
       }
-    } else {
+    } else if (this.grid === 'crosses') {
+      // a small + at each intersection — the draughtsman's registration marks
       for (const major of [false, true]) {
-        const r = (major ? 2.3 : 1.6) * dpr
+        const arm = (major ? 4.5 : 3) * dpr
         ctx.beginPath()
         for (const [y, my] of rows) {
+          const py = Math.round(y) + 0.5
           for (const [x, mx] of cols) {
             if ((mx && my) !== major) continue
-            ctx.moveTo(x + r, y)
-            ctx.arc(x, y, r, 0, Math.PI * 2)
+            const px = Math.round(x) + 0.5
+            ctx.moveTo(px - arm, py); ctx.lineTo(px + arm, py)
+            ctx.moveTo(px, py - arm); ctx.lineTo(px, py + arm)
           }
         }
-        ctx.fillStyle = major ? g.major : g.minor
+        ctx.strokeStyle = major ? g.major : g.minor
         ctx.globalAlpha = fade
-        ctx.fill()
+        ctx.lineWidth = 1
+        ctx.stroke()
       }
+    } else if (this.grid === 'iso') {
+      // isometric weave: the two 30° diagonal families make a diamond lattice
+      // that stays self-aligned at every zoom. One quiet weight — major
+      // emphasis turns a woven field into noise.
+      const s = Math.tan(Math.PI / 6) // 30° from horizontal
+      ctx.beginPath()
+      for (const sign of [1, -1]) {
+        const slope = sign * s
+        // page-space intercepts k*step, mapped into device space
+        const b0 = -slope * cam.x + cam.y // device intercept of the k=0 line, /z
+        const lo = Math.min(0, -slope * (W / z)) // device-x range → intercept range
+        const hi = Math.max(H / z, H / z - slope * (W / z))
+        const k0 = Math.ceil((lo - b0) / step)
+        const k1 = Math.floor((hi - b0) / step)
+        for (let k = k0; k <= k1; k++) {
+          const b = (b0 + k * step) * z
+          ctx.moveTo(0, b)
+          ctx.lineTo(W, b + slope * W)
+        }
+      }
+      ctx.strokeStyle = g.minor
+      ctx.globalAlpha = fade
+      ctx.lineWidth = 1
+      ctx.stroke()
+    } else {
+      // one weight, one ink — emphasized dots read as stray marks on the paper
+      const r = 1.6 * dpr
+      ctx.beginPath()
+      for (const [y] of rows) {
+        for (const [x] of cols) {
+          ctx.moveTo(x + r, y)
+          ctx.arc(x, y, r, 0, Math.PI * 2)
+        }
+      }
+      ctx.fillStyle = g.minor
+      ctx.globalAlpha = fade
+      ctx.fill()
     }
     ctx.restore()
   }

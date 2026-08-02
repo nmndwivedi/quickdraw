@@ -12,7 +12,7 @@ const theme = localStorage.getItem(THEME_KEY) || (prefersDark ? 'dark' : 'light'
 const board = createQuickdraw({
   container: document.getElementById('board'),
   theme,
-  grid: 'dots',
+  grid: 'lines',
 })
 
 const { editor } = board

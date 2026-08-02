@@ -1,6 +1,6 @@
 {
   "name": "@quickdrawjs/react-native",
-  "version": "0.1.3",
+  "version": "0.2.0",
   "description": "React Native component for Quickdraw — the MIT-licensed infinite-canvas whiteboard SDK (WebView-based).",
   "type": "module",
   "main": "./src/index.js",
@@ -38,7 +38,7 @@
     "excalidraw-alternative"
   ],
   "dependencies": {
-    "@quickdrawjs/core": "0.1.3"
+    "@quickdrawjs/core": "0.2.0"
   },
   "devDependencies": {
     "esbuild": "^0.25.0"

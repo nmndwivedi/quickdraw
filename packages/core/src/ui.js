@@ -43,17 +43,30 @@ const ICONS = {
   copy: SVG('<rect width="14" height="14" x="8" y="8" rx="2"/><path d="M4 16a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2"/>'),
   fit: SVG('<path d="M8 3H5a2 2 0 0 0-2 2v3"/><path d="M21 8V5a2 2 0 0 0-2-2h-3"/><path d="M3 16v3a2 2 0 0 0 2 2h3"/><path d="M16 21h3a2 2 0 0 0 2-2v-3"/>'),
   trash: SVG('<path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>'),
+  check: SVG('<path d="M20 6 9 17l-5-5"/>'),
+  chevronRight: SVG('<path d="m9 18 6-6-6-6"/>'),
+  chevronLeft: SVG('<path d="m15 18-6-6 6-6"/>'),
   sun: SVG('<circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/>'),
   moon: SVG('<path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/>'),
 }
+// the action bar wears the same glyphs the menu already uses
+ICONS.duplicate = ICONS.copy
+ICONS.delete = ICONS.trash
 
 // grid backdrops: bare paper, ruled lines, dotted intersections
 const GRID_ICONS = {
   none: SVG('<rect width="18" height="18" x="3" y="3" rx="2"/>'),
   lines: SVG('<rect width="18" height="18" x="3" y="3" rx="2"/><path d="M9 3v18M15 3v18M3 9h18M3 15h18" stroke-width="1.4"/>'),
+  ruled: SVG('<rect width="18" height="18" x="3" y="3" rx="2"/><path d="M3 8.5h18M3 13h18M3 17.5h18" stroke-width="1.4"/>'),
   dots: SVG('<rect width="18" height="18" x="3" y="3" rx="2"/><path d="M8 8h.01M12 8h.01M16 8h.01M8 12h.01M12 12h.01M16 12h.01M8 16h.01M12 16h.01M16 16h.01" stroke-width="2.2"/>'),
+  crosses: SVG('<rect width="18" height="18" x="3" y="3" rx="2"/><path d="M8 6.5v3M6.5 8h3M16 6.5v3M14.5 8h3M12 10.5v3M10.5 12h3M8 14.5v3M6.5 16h3M16 14.5v3M14.5 16h3" stroke-width="1.3"/>'),
+  iso: SVG('<rect width="18" height="18" x="3" y="3" rx="2"/><path d="m3 7 10.4 14M8.6 3 19 17M21 7 10.6 21M15.4 3 5 17" stroke-width="1.2"/>'),
 }
-const GRID_TIPS = { none: 'No grid', lines: 'Grid lines', dots: 'Grid dots' }
+const GRID_TIPS = {
+  none: 'No grid', lines: 'Grid lines', ruled: 'Ruled paper',
+  dots: 'Grid dots', crosses: 'Crosses', iso: 'Isometric',
+}
+const GRID_LABELS = { none: 'None', lines: 'Lines', ruled: 'Ruled', dots: 'Dots', crosses: 'Crosses', iso: 'Isometric' }
 
 const DASH_ICONS = {
   draw: SVG('<path d="M4 15c3.2-4.5 6-5.5 8-3.5s5 1.5 8-4.5"/>'),
@@ -73,13 +86,13 @@ const TIPS = {
   eraser: 'Eraser — E', laser: 'Laser — K', line: 'Line — L', arrow: 'Arrow — A',
   geo: 'Shape — G', text: 'Text — T', note: 'Sticky note — N', image: 'Insert image',
   undo: 'Undo — ⌘Z', redo: 'Redo — ⇧⌘Z', menu: 'Board menu', more: 'More tools',
-  tools: 'Tools',
+  tools: 'Tools', duplicate: 'Duplicate — ⌘D', delete: 'Delete — ⌫',
 }
 
 // dock buttons in visual order (styles/more/menu ride at the end, always)
-const DOCK_NAMES = ['undo', 'redo', 'select', 'hand', 'draw', 'highlight', 'eraser', 'laser', 'line', 'arrow', 'geo', 'text', 'note', 'image']
+const DOCK_NAMES = ['select', 'hand', 'draw', 'highlight', 'eraser', 'laser', 'line', 'arrow', 'geo', 'text', 'note', 'image']
 // what gives way first as the frame narrows (select and draw never yield)
-const DROP_ORDER = ['redo', 'undo', 'hand', 'laser', 'line', 'note', 'image', 'highlight', 'text', 'arrow', 'eraser', 'geo']
+const DROP_ORDER = ['hand', 'laser', 'line', 'note', 'image', 'highlight', 'text', 'arrow', 'eraser', 'geo']
 
 export function buildUI(editor, { hidden = false, onSave, themeToggle = true, gridControl = true } = {}) {
   const root = editor.container
@@ -114,35 +127,30 @@ export function buildUI(editor, { hidden = false, onSave, themeToggle = true, gr
 
   // ---- actions -------------------------------------------------------------
   const run = (name, b) => {
-    if (name === 'undo') return editor.store.undo()
-    if (name === 'redo') return editor.store.redo()
     if (name === 'image') { closePopover(); return editor.pickImage() }
     if (name === 'geo') return geoTap(b)
     closePopover()
     editor.setTool(name)
   }
-  // the shape button: tap arms the current kind, tap again opens the kinds
+  // the shape button: every tap arms the current kind AND shows the kinds,
+  // so picking a shape never takes a second hunt for the menu
   const geoTap = (b) => {
-    if (editor.tool === 'geo') {
-      openPopover('geo', (p) => {
-        p.classList.add('qd-geo-pop')
-        for (const g of GEO_IDS) {
-          const gb = el('button', 'qd-tool' + (editor.geoKind === g ? ' on' : ''))
-          gb.innerHTML = ICONS[g]
-          gb.title = g
-          gb.addEventListener('click', (ev) => {
-            ev.stopPropagation()
-            editor.setGeoKind(g)
-            editor.setTool('geo')
-            closePopover()
-          })
-          p.appendChild(gb)
-        }
-      }, b)
-    } else {
-      closePopover()
-      editor.setTool('geo')
-    }
+    editor.setTool('geo')
+    openPopover('geo', (p) => {
+      p.classList.add('qd-geo-pop')
+      for (const g of GEO_IDS) {
+        const gb = el('button', 'qd-tool' + (editor.geoKind === g ? ' on' : ''))
+        gb.innerHTML = ICONS[g]
+        gb.title = g
+        gb.addEventListener('click', (ev) => {
+          ev.stopPropagation()
+          editor.setGeoKind(g)
+          editor.setTool('geo')
+          closePopover()
+        })
+        p.appendChild(gb)
+      }
+    }, b)
   }
 
   const makeBtn = (name, onClick, cls = 'qd-tool') => {
@@ -169,8 +177,6 @@ export function buildUI(editor, { hidden = false, onSave, themeToggle = true, gr
   }
   const divider = () => { const d = el('i', 'qd-div'); dock.appendChild(d); dividers.push(d) }
 
-  addBtn('undo'); addBtn('redo')
-  divider()
   addBtn('select'); addBtn('hand')
   divider()
   addBtn('draw'); addBtn('highlight'); addBtn('eraser'); addBtn('laser')
@@ -198,16 +204,32 @@ export function buildUI(editor, { hidden = false, onSave, themeToggle = true, gr
   const menuBtn = makeBtn('menu', (e, b) => openPopover('menu', buildMenu, b))
   dock.appendChild(menuBtn)
 
+  // ---- action bar ----------------------------------------------------------
+  // history + selection actions ride their own small pill so they stay one
+  // tap away no matter how far the tool dock folds
+  const actionBar = el('div', 'qd-actions')
+  ui.appendChild(actionBar)
+  const actBtns = new Map()
+  const addAction = (name, fn) => {
+    const b = makeBtn(name, fn)
+    actionBar.appendChild(b)
+    actBtns.set(name, b)
+    return b
+  }
+  addAction('undo', () => editor.store.undo())
+  addAction('redo', () => editor.store.redo())
+  actionBar.appendChild(el('i', 'qd-div'))
+  addAction('duplicate', () => editor.duplicateSelection())
+  addAction('delete', () => editor.deleteSelection())
+
   // ---- overflow grid (compact "more" / folded "tools") ---------------------
   function buildGrid(p, names) {
     p.classList.add('qd-grid-pop')
     for (const name of names) {
-      const isTool = !['undo', 'redo', 'image'].includes(name)
+      const isTool = name !== 'image'
       const b = makeBtn(name, (e, b2) => run(name, b2))
       if (name === 'geo') b.innerHTML = ICONS[editor.geoKind]
       if (isTool && editor.tool === name) b.classList.add('on')
-      if (name === 'undo') b.disabled = !editor.store.canUndo
-      if (name === 'redo') b.disabled = !editor.store.canRedo
       p.appendChild(b)
     }
   }
@@ -320,10 +342,62 @@ export function buildUI(editor, { hidden = false, onSave, themeToggle = true, gr
 
     if (opts.gridControl || opts.themeToggle) p.appendChild(el('i', 'qd-menu-div'))
     if (opts.gridControl) {
-      segment('Grid', GRID_IDS, {
-        icons: GRID_ICONS, tips: GRID_TIPS, current: editor.grid,
-        onPick: (id) => editor.setGrid(id),
+      // a standard nested dropdown: the row grows a flyout beside the menu —
+      // six buttons inline read as clutter
+      // a div, not a button: the flyout nests inside, and buttons can't nest
+      const row = el('div', 'qd-menu-item qd-has-sub')
+      row.setAttribute('role', 'button')
+      row.tabIndex = 0
+      row.innerHTML =
+        `<span class="qd-mi-ico">${GRID_ICONS[editor.grid]}</span>` +
+        '<span class="qd-mi-label">Grid</span>' +
+        '<span class="qd-mi-value"></span>' +
+        `<span class="qd-mi-chev">${ICONS.chevronRight}</span>`
+      row.querySelector('.qd-mi-value').textContent = GRID_LABELS[editor.grid]
+
+      const sub = el('div', 'qd-submenu')
+      for (const id of GRID_IDS) {
+        const b = el('button', 'qd-menu-item')
+        b.innerHTML =
+          `<span class="qd-mi-ico">${GRID_ICONS[id]}</span>` +
+          '<span class="qd-mi-label"></span>' +
+          `<span class="qd-mi-check">${editor.grid === id ? ICONS.check : ''}</span>`
+        b.querySelector('.qd-mi-label').textContent = GRID_LABELS[id]
+        b.title = GRID_TIPS[id]
+        b.addEventListener('click', (e) => {
+          e.stopPropagation()
+          editor.setGrid(id)
+          sub.querySelectorAll('.qd-mi-check').forEach((c, i) => { c.innerHTML = GRID_IDS[i] === id ? ICONS.check : '' })
+          row.querySelector('.qd-mi-ico').innerHTML = GRID_ICONS[id]
+          row.querySelector('.qd-mi-value').textContent = GRID_LABELS[id]
+        })
+        sub.appendChild(b)
+      }
+      row.appendChild(sub)
+
+      const openSub = () => {
+        row.classList.add('sub-open')
+        // side with room wins: nested menus prefer the right, but the board
+        // menu usually hugs the right edge of the frame
+        const rr = root.getBoundingClientRect()
+        const br = row.getBoundingClientRect()
+        const fitsRight = br.right + sub.offsetWidth + 12 <= rr.right
+        sub.classList.toggle('qd-sub-left', !fitsRight)
+        // grow upward when the row sits low in the frame
+        const fitsDown = br.top - 7 + sub.offsetHeight <= rr.bottom - 8
+        sub.style.top = fitsDown ? '' : 'auto'
+        sub.style.bottom = fitsDown ? '' : '-7px'
+      }
+      const closeSub = () => row.classList.remove('sub-open')
+      let subT
+      row.addEventListener('mouseenter', () => { clearTimeout(subT); openSub() })
+      row.addEventListener('mouseleave', () => { subT = setTimeout(closeSub, 180) })
+      // tap toggles, for pointers that don't hover
+      row.addEventListener('click', (e) => {
+        e.stopPropagation()
+        row.classList.contains('sub-open') ? closeSub() : openSub()
       })
+      p.appendChild(row)
     }
     if (opts.themeToggle) {
       segment('Theme', ['light', 'dark'], {
@@ -371,8 +445,6 @@ export function buildUI(editor, { hidden = false, onSave, themeToggle = true, gr
       const extra = Math.max(0, slots - 5)
       const keep = new Set(['select', 'draw'])
       for (let i = DROP_ORDER.length - 1, n = extra; i >= 0 && n > 0; i--, n--) keep.add(DROP_ORDER[i])
-      // undo/redo travel as a pair — half of it in the flyout reads as a bug
-      if (!keep.has('redo')) keep.delete('undo')
       hid = DOCK_NAMES.filter((n) => !keep.has(n))
     }
     const changed = m !== mode || hid.join() !== hiddenNames.join()
@@ -396,13 +468,16 @@ export function buildUI(editor, { hidden = false, onSave, themeToggle = true, gr
   function refresh() {
     for (const n of DOCK_NAMES) {
       const b = dockBtns.get(n)
-      if (['undo', 'redo', 'image'].includes(n)) continue
+      if (n === 'image') continue
       b.classList.toggle('on', editor.tool === n)
     }
     const geoBtn = dockBtns.get('geo')
     geoBtn.innerHTML = ICONS[editor.geoKind]
-    dockBtns.get('undo').disabled = !editor.store.canUndo
-    dockBtns.get('redo').disabled = !editor.store.canRedo
+    actBtns.get('undo').disabled = !editor.store.canUndo
+    actBtns.get('redo').disabled = !editor.store.canRedo
+    const hasSel = editor.selection.size > 0
+    actBtns.get('duplicate').disabled = !hasSel
+    actBtns.get('delete').disabled = !hasSel
     // the folded button wears the active tool so the state stays visible
     toolsBtn.innerHTML = ICONS[editor.tool === 'geo' ? editor.geoKind : editor.tool] || ICONS.select
     toolsBtn.classList.toggle('on', popover?.name === 'tools')

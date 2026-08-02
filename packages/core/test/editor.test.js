@@ -324,19 +324,20 @@ function recordingCtx() {
 }
 
 describe('grid', () => {
-  it('defaults to none, switches, and emits', () => {
+  it('defaults to lines, switches, and emits', () => {
     const seen = []
     editor.on('grid', () => seen.push(editor.grid))
-    expect(editor.grid).toBe('none')
-    editor.setGrid('lines')
-    editor.setGrid('lines') // no-op, no event
+    expect(editor.grid).toBe('lines')
+    editor.setGrid('none')
+    editor.setGrid('none') // no-op, no event
     editor.setGrid('nonsense') // rejected
     editor.setGrid('dots')
     expect(editor.grid).toBe('dots')
-    expect(seen).toEqual(['lines', 'dots'])
+    expect(seen).toEqual(['none', 'dots'])
   })
 
   it('draws nothing when off', () => {
+    editor.setGrid('none')
     const ctx = recordingCtx()
     editor._drawGrid(ctx, { x: 0, y: 0, z: 1 }, 400, 300, 1)
     expect(ctx.calls.length).toBe(0)
@@ -370,21 +371,18 @@ describe('grid', () => {
     expect(stepAt(3)).toBe(20)
   })
 
-  it('dots mark intersections, the every-fifth pair bigger', () => {
+  it('dots mark intersections in one uniform weight and ink', () => {
     editor.setGrid('dots')
     const ctx = recordingCtx()
     editor._drawGrid(ctx, { x: 0, y: 0, z: 1 }, 400, 200, 1)
     const arcs = ctx.calls.filter((c) => c[0] === 'arc')
     expect(arcs.length).toBe(11 * 6)
-    const radii = [...new Set(arcs.map((c) => c[3]))].sort((a, b) => a - b)
-    expect(radii).toEqual([1.6, 2.3])
+    const radii = [...new Set(arcs.map((c) => c[3]))]
+    expect(radii).toEqual([1.6])
     // dots carry less ink than rules, so they run darker to read as calm
     const fills = ctx.calls.filter((c) => c[0] === 'fill')
+    expect(fills.length).toBe(1)
     expect(fills[0][1]).toBe(editor.theme.grid.dot.minor)
-    expect(fills[1][1]).toBe(editor.theme.grid.dot.major)
-    // majors are where both axes land on a fifth: (0,0), (200,0), (400,0), (0,200)...
-    const big = arcs.filter((c) => c[3] === 2.3).map((c) => `${c[1]},${c[2]}`)
-    expect(big.sort()).toEqual(['0,0', '0,200', '200,0', '200,200', '400,0', '400,200'])
   })
 
   it('travels with the camera', () => {
@@ -523,7 +521,7 @@ describe('createQuickdraw UI', () => {
     const c2 = document.createElement('div')
     document.body.appendChild(c2)
     const board = createQuickdraw({ container: c2 })
-    const btn = (n) => c2.querySelector(`.qd-dock button[data-name="${n}"]`)
+    const btn = (n) => c2.querySelector(`.qd-actions button[data-name="${n}"]`)
     expect(btn('undo').disabled).toBe(true)
 
     board.editor.setTool('draw')
@@ -543,6 +541,30 @@ describe('createQuickdraw UI', () => {
     c2.remove()
   })
 
+  it('duplicate/delete light up with a selection and act on it', () => {
+    const c2 = document.createElement('div')
+    document.body.appendChild(c2)
+    const board = createQuickdraw({ container: c2 })
+    const btn = (n) => c2.querySelector(`.qd-actions button[data-name="${n}"]`)
+    expect(btn('duplicate').disabled).toBe(true)
+    expect(btn('delete').disabled).toBe(true)
+
+    board.editor.setTool('draw')
+    drag(board.editor, [[10, 10], [40, 40], [80, 60]])
+    const id = board.editor.store.shapes()[0].id
+    board.editor.setSelection([id])
+    expect(btn('duplicate').disabled).toBe(false)
+    expect(btn('delete').disabled).toBe(false)
+
+    btn('duplicate').click()
+    expect(board.editor.store.shapes().length).toBe(2)
+    btn('delete').click()
+    expect(board.editor.store.shapes().length).toBe(1)
+    expect(btn('duplicate').disabled).toBe(true)
+    board.destroy()
+    c2.remove()
+  })
+
   it('the board menu switches theme and grid', () => {
     const c2 = document.createElement('div')
     document.body.appendChild(c2)
@@ -557,11 +579,32 @@ describe('createQuickdraw UI', () => {
     expect(board.editor.theme.id).toBe('dark')
     expect(btns('Theme')[1].classList.contains('on')).toBe(true)
 
-    expect(board.editor.grid).toBe('none')
-    btns('Grid')[1].click()
+    // grid is a nested dropdown: the row shows the current value…
     expect(board.editor.grid).toBe('lines')
-    btns('Grid')[2].click()
+    const gridRow = c2.querySelector('.qd-has-sub')
+    expect(gridRow.textContent).toContain('Grid')
+    expect(gridRow.textContent).toContain('Lines')
+    expect(gridRow.classList.contains('sub-open')).toBe(false)
+    gridRow.click()
+    expect(gridRow.classList.contains('sub-open')).toBe(true)
+    // …and the flyout lists every backdrop with a check on the current one
+    const options = [...gridRow.querySelectorAll('.qd-submenu .qd-menu-item')]
+    expect(options.length).toBe(6)
+    expect(options[1].querySelector('.qd-mi-check').innerHTML).not.toBe('')
+    options[0].click()
+    expect(board.editor.grid).toBe('none')
+    options[3].click()
     expect(board.editor.grid).toBe('dots')
+    options[5].click()
+    expect(board.editor.grid).toBe('iso')
+    // picking keeps the flyout open and refreshes the check + parent value
+    expect(gridRow.classList.contains('sub-open')).toBe(true)
+    expect(options[5].querySelector('.qd-mi-check').innerHTML).not.toBe('')
+    expect(options[1].querySelector('.qd-mi-check').innerHTML).toBe('')
+    expect(gridRow.querySelector('.qd-mi-value').textContent).toBe('Isometric')
+    // tapping the parent row again folds the flyout
+    gridRow.click()
+    expect(gridRow.classList.contains('sub-open')).toBe(false)
 
     board.destroy()
     c2.remove()
@@ -576,9 +619,10 @@ describe('createQuickdraw UI', () => {
     // and back on again, live
     board.ui.setOptions({ gridControl: true })
     c2.querySelector('.qd-dock button[data-name="menu"]').click()
-    const rows = [...c2.querySelectorAll('.qd-menu-row')]
-    expect(rows.length).toBe(1)
-    expect(rows[0].textContent).toContain('Grid')
+    const gridRow = [...c2.querySelectorAll('.qd-menu-item')]
+      .find((r) => r.textContent.trim().startsWith('Grid'))
+    expect(gridRow).toBeTruthy()
+    expect(c2.querySelectorAll('.qd-menu-row').length).toBe(0) // theme still off
     board.destroy()
     c2.remove()
   })

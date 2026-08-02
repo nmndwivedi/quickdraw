@@ -36,7 +36,7 @@ describe('palette', () => {
   })
 
   it('every theme carries two-weight grid ink for rules and dots', () => {
-    expect(GRID_IDS).toEqual(['none', 'lines', 'dots'])
+    expect(GRID_IDS).toEqual(['none', 'lines', 'ruled', 'dots', 'crosses', 'iso'])
     const alpha = (c) => parseFloat(c.split(',').pop())
     for (const theme of Object.values(THEMES)) {
       for (const kind of ['line', 'dot']) {
