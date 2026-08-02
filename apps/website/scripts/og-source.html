@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Quickdraw OG source — 1200×630</title>
+<!--
+  Source for public/og.png. Open this file, screenshot the 1200×630 .card,
+  and save as apps/website/public/og.png.
+  Palette is taken from Base.astro: --paper #faf8f4, --ink #1c1b18,
+  --ink-soft #57544c, --accent #2f6fed.
+  The right-hand flourish is the brand mark's own spiral, drawn on canvas
+  with a velocity-style taper so it reads as the product's pressure ink.
+-->
+<style>
+  html,body{margin:0;padding:0;background:#e9e7e2}
+  .card{
+    position:relative; width:1200px; height:630px; overflow:hidden;
+    background:#faf8f4;
+    background-image:radial-gradient(circle, #dedbd4 1.35px, transparent 1.45px);
+    background-size:34px 34px; background-position:-2px -2px;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;
+    color:#1c1b18;
+  }
+  .brand{position:absolute; left:92px; top:132px; display:flex; align-items:center; gap:18px}
+  .brand svg{width:56px; height:56px; display:block}
+  .brand span{font-size:44px; font-weight:800; letter-spacing:-.022em}
+
+  h1{
+    position:absolute; left:92px; top:252px; margin:0; max-width:760px;
+    font-size:74px; line-height:1.08; font-weight:800; letter-spacing:-.035em;
+  }
+  h1 .blue{color:#2f6fed; display:block}
+
+  .sub{
+    position:absolute; left:92px; top:452px; margin:0;
+    font-size:27px; color:#57544c; letter-spacing:-.012em;
+  }
+  .pill{
+    position:absolute; left:92px; top:512px;
+    background:#1c1b18; color:#faf8f4; border-radius:11px;
+    padding:15px 22px; font-size:24px; letter-spacing:-.01em;
+    font-family:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,monospace;
+  }
+  /* the flourish lives in the free right-hand column, clear of the headline */
+  canvas.ink{position:absolute; right:52px; top:86px; width:300px; height:300px}
+  .accent-dot{
+    position:absolute; right:104px; bottom:150px;
+    width:30px; height:30px; border-radius:50%; background:#2f6fed;
+  }
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="brand">
+    <!-- the standard mark: identical geometry to favicon.svg -->
+    <svg viewBox="0 0 32 32" fill="none">
+      <path d="M7 21 C7 12, 13 6.5, 20 7.5 C26.5 8.5, 27.5 16, 22 18.8 C17.5 21, 13 19.5, 14 15"
+            stroke="#1c1b18" stroke-width="3" stroke-linecap="round" fill="none"/>
+      <circle cx="24.5" cy="24.5" r="2.6" fill="#2f6fed"/>
+    </svg>
+    <span>Quickdraw</span>
+  </div>
+
+  <h1>The whiteboard SDK<span class="blue">without the license fee</span></h1>
+  <p class="sub">MIT licensed · React, React Native &amp; plain JS · Zero dependencies</p>
+  <div class="pill">npm i @quickdrawjs/react</div>
+
+  <canvas class="ink" width="840" height="840"></canvas>
+  <div class="accent-dot"></div>
+</div>
+
+<script>
+// Draw the brand mark's spiral large, with a pressure-style taper:
+// thin on entry, full-bodied through the curve, tapering out at the tail —
+// the same behaviour the SDK's pen produces.
+const cv = document.querySelector('canvas.ink');
+const ctx = cv.getContext('2d');
+const S = 840 / 32;                       // scale the 32×32 mark up to the canvas
+const P = new Path2D();
+
+// Sample the mark's own path so the flourish and the logo are the same curve.
+const svgNS = 'http://www.w3.org/2000/svg';
+const tmp = document.createElementNS(svgNS, 'svg');
+const p = document.createElementNS(svgNS, 'path');
+p.setAttribute('d', 'M7 21 C7 12, 13 6.5, 20 7.5 C26.5 8.5, 27.5 16, 22 18.8 C17.5 21, 13 19.5, 14 15');
+tmp.appendChild(p); document.body.appendChild(tmp);
+const total = p.getTotalLength();
+
+const STEPS = 420;
+ctx.lineCap = 'round';
+ctx.strokeStyle = '#2f6fed';
+for (let i = 0; i < STEPS; i++) {
+  const t0 = i / STEPS, t1 = (i + 1) / STEPS;
+  const a = p.getPointAtLength(t0 * total);
+  const b = p.getPointAtLength(t1 * total);
+  // taper profile: ease in from 25% width, peak mid-stroke, ease out to 15%
+  const t = (t0 + t1) / 2;
+  const env = Math.sin(Math.PI * Math.pow(t, 0.82));
+  const w = (0.16 + 0.84 * env) * 3.15 * S * 0.42;
+  ctx.lineWidth = Math.max(w, 1.2);
+  ctx.beginPath();
+  ctx.moveTo(a.x * S, a.y * S);
+  ctx.lineTo(b.x * S, b.y * S);
+  ctx.stroke();
+}
+tmp.remove();
+</script>
+</body>
+</html>
