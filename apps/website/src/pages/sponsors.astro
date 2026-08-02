@@ -28,13 +28,6 @@ import { SPONSOR_URL } from '../lib/sponsors.js'
     <section class="wall-section">
       <h2>The wall</h2>
       <SponsorWall />
-      <p class="fine-print">
-        The wall syncs with <a href={SPONSOR_URL} rel="noopener">GitHub
-        Sponsors</a> daily — sponsor there and you appear here automatically,
-        name and avatar, no PR needed. Prefer a proper logo? Send an SVG via
-        <a href={`${GITHUB_URL}/issues`} rel="noopener">issue</a> and it
-        replaces the avatar.
-      </p>
     </section>
   </main>
 </Base>
@@ -58,11 +51,6 @@ import { SPONSOR_URL } from '../lib/sponsors.js'
   .btn:hover { text-decoration: none; background: var(--paper-2); }
   .btn.primary { background: var(--ink); color: var(--paper); }
   .btn.primary:hover { background: #000; }
-
-  .fine-print {
-    font-size: 13.5px; color: var(--ink-soft);
-    margin: 18px 0 0; max-width: 72ch; text-wrap: pretty;
-  }
 
   @media (max-width: 460px) {
     .actions { display: grid; grid-template-columns: 1fr; gap: 10px; }
