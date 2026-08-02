@@ -1,5 +1,8 @@
 /* Quickdraw styles — self-contained, no preprocessor, importable raw.
-   The dock is dark glass so it reads on either theme's paper. */
+   All floating chrome (dock, actions, popovers) follows the board's theme
+   through the --qd-* custom properties below: dark glass on the dark paper,
+   light glass on the light one. Theme switches animate because the surfaces
+   transition background/color/border while the variables flip. */
 
 .qd-root {
   position: relative;
@@ -10,11 +13,53 @@
   background: #fbf9f4;
   touch-action: none;
   border-radius: inherit;
+  transition: background 320ms ease;
   /* lets the watermark dodge the dock on narrow boards (see below) */
   container-type: inline-size;
+
+  /* light-theme chrome */
+  --qd-bar-bg: rgba(255, 255, 255, 0.88);
+  --qd-pop-bg: rgba(255, 255, 255, 0.94);
+  --qd-border: rgba(28, 27, 24, 0.12);
+  --qd-bar-shadow: 0 4px 16px rgba(28, 27, 24, 0.14);
+  --qd-pop-shadow: 0 8px 28px rgba(28, 27, 24, 0.2);
+  --qd-ink: rgba(28, 27, 24, 0.82);
+  --qd-ink-strong: rgba(28, 27, 24, 0.94);
+  --qd-ink-soft: rgba(28, 27, 24, 0.55);
+  --qd-ink-faint: rgba(28, 27, 24, 0.4);
+  --qd-hover: rgba(28, 27, 24, 0.07);
+  --qd-hover-strong: rgba(28, 27, 24, 0.1);
+  --qd-active: rgba(28, 27, 24, 0.12);
+  --qd-on-bg: #211d14;
+  --qd-on-ink: #fbf9f4;
+  --qd-divider: rgba(28, 27, 24, 0.14);
+  --qd-menu-div: rgba(28, 27, 24, 0.1);
+  --qd-seg-bg: rgba(28, 27, 24, 0.07);
+  --qd-dot-ring: rgba(28, 27, 24, 0.12);
 }
-.qd-root[data-qd-theme='dark'] { background: #191713; }
-.qd-root { transition: background 320ms ease; }
+.qd-root[data-qd-theme='dark'] {
+  background: #191713;
+
+  /* dark-theme chrome: the original dark glass */
+  --qd-bar-bg: rgba(19, 17, 13, 0.72);
+  --qd-pop-bg: rgba(19, 17, 13, 0.85);
+  --qd-border: rgba(255, 255, 255, 0.14);
+  --qd-bar-shadow: 0 4px 16px rgba(10, 8, 4, 0.25);
+  --qd-pop-shadow: 0 8px 28px rgba(10, 8, 4, 0.35);
+  --qd-ink: rgba(255, 255, 255, 0.85);
+  --qd-ink-strong: rgba(255, 255, 255, 0.95);
+  --qd-ink-soft: rgba(255, 255, 255, 0.62);
+  --qd-ink-faint: rgba(255, 255, 255, 0.4);
+  --qd-hover: rgba(255, 255, 255, 0.1);
+  --qd-hover-strong: rgba(255, 255, 255, 0.12);
+  --qd-active: rgba(255, 255, 255, 0.22);
+  --qd-on-bg: rgba(255, 255, 255, 0.92);
+  --qd-on-ink: #211d14;
+  --qd-divider: rgba(255, 255, 255, 0.16);
+  --qd-menu-div: rgba(255, 255, 255, 0.1);
+  --qd-seg-bg: rgba(255, 255, 255, 0.08);
+  --qd-dot-ring: rgba(255, 255, 255, 0.12);
+}
 
 /* snapshot of the outgoing theme, faded out by the editor on setTheme() */
 .qd-theme-fade {
@@ -37,6 +82,8 @@
 .qd-overlay { pointer-events: none; }
 
 /* ---- floating chrome ---- */
+/* The theme switch rides these transitions; hovers use the same clock, which
+   at 140–320ms still reads as instant. */
 .qd-ui { position: absolute; inset: 0; pointer-events: none; z-index: 40; }
 .qd-ui.qd-hidden { display: none; }
 .qd-ui button { -webkit-tap-highlight-color: transparent; }
@@ -52,12 +99,13 @@
   gap: 2px;
   padding: 5px 7px;
   border-radius: 999px;
-  background: rgba(19, 17, 13, 0.72);
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  box-shadow: 0 4px 16px rgba(10, 8, 4, 0.25);
+  background: var(--qd-bar-bg);
+  border: 1px solid var(--qd-border);
+  box-shadow: var(--qd-bar-shadow);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   pointer-events: auto;
+  transition: background 320ms ease, border-color 320ms ease, box-shadow 320ms ease;
 }
 
 /* history + selection actions: a vertical pill hugging the left edge.
@@ -73,16 +121,17 @@
   gap: 2px;
   padding: 6px 4px;
   border-radius: 999px;
-  background: rgba(19, 17, 13, 0.72);
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  box-shadow: 0 4px 16px rgba(10, 8, 4, 0.25);
+  background: var(--qd-bar-bg);
+  border: 1px solid var(--qd-border);
+  box-shadow: var(--qd-bar-shadow);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   pointer-events: auto;
+  transition: background 320ms ease, border-color 320ms ease, box-shadow 320ms ease;
 }
 .qd-actions button svg { width: 17px; height: 17px; display: block; }
 .qd-actions .qd-div { width: 18px; height: 1px; margin: 3px 0; }
-.qd-actions button:hover { background: rgba(255, 255, 255, 0.1); }
+.qd-actions button:hover { background: var(--qd-hover); }
 .qd-actions button:disabled { opacity: 0.32; pointer-events: none; }
 .qd-actions .qd-tool { width: 30px; height: 30px; }
 
@@ -96,15 +145,16 @@
   border: none;
   border-radius: 9px;
   background: transparent;
-  color: rgba(255, 255, 255, 0.85);
+  color: var(--qd-ink);
   cursor: pointer;
   padding: 0;
+  transition: background 140ms ease, color 140ms ease;
 }
 .qd-dock button svg { width: 19px; height: 19px; display: block; }
-.qd-dock button:hover { background: rgba(255, 255, 255, 0.1); }
-.qd-dock button.on { background: rgba(255, 255, 255, 0.92); color: #211d14; }
+.qd-dock button:hover { background: var(--qd-hover); }
+.qd-dock button.on { background: var(--qd-on-bg); color: var(--qd-on-ink); }
 .qd-dock button:disabled { opacity: 0.32; pointer-events: none; }
-.qd-div { width: 1px; height: 20px; margin: 0 3px; background: rgba(255, 255, 255, 0.16); flex: none; }
+.qd-div { width: 1px; height: 20px; margin: 0 3px; background: var(--qd-divider); flex: none; transition: background 320ms ease; }
 .qd-dock.qd-compact { gap: 2px; }
 
 .qd-geo-btn { position: relative; }
@@ -125,10 +175,11 @@
   width: 16px;
   height: 16px;
   border-radius: 50%;
-  border: 2.5px solid rgba(255, 255, 255, 0.92);
+  border: 2.5px solid var(--qd-on-bg);
   box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.2);
+  transition: border-color 320ms ease;
 }
-.qd-style-btn.on .qd-style-dot { border-color: #211d14; }
+.qd-style-btn.on .qd-style-dot { border-color: var(--qd-on-ink); }
 
 /* ---- popovers ---- */
 .qd-popover {
@@ -136,15 +187,16 @@
   bottom: 54px;
   left: 50%;
   border-radius: 13px;
-  background: rgba(19, 17, 13, 0.85);
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  box-shadow: 0 8px 28px rgba(10, 8, 4, 0.35);
+  background: var(--qd-pop-bg);
+  border: 1px solid var(--qd-border);
+  box-shadow: var(--qd-pop-shadow);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   pointer-events: auto;
   padding: 8px;
   max-width: calc(100% - 16px);
   box-sizing: border-box;
+  transition: background 320ms ease, border-color 320ms ease, box-shadow 320ms ease;
   /* rise out of the dock: a short fade + lift + settle */
   transform-origin: 50% 100%;
   animation: qd-pop-in 160ms cubic-bezier(0.2, 0.9, 0.3, 1.15);
@@ -162,16 +214,16 @@
 .qd-popover .qd-tool svg { width: 19px; height: 19px; display: block; }
 
 .qd-geo-pop { display: flex; gap: 2px; flex-wrap: wrap; }
-.qd-geo-pop .qd-tool { color: rgba(255, 255, 255, 0.85); }
+.qd-geo-pop .qd-tool { color: var(--qd-ink); }
 
 /* overflow tools ("more" flyout / folded kit) */
 .qd-grid-pop { display: grid; grid-template-columns: repeat(4, 32px); gap: 2px; }
-.qd-grid-pop .qd-tool { color: rgba(255, 255, 255, 0.85); }
-.qd-grid-pop .qd-tool.on { background: rgba(255, 255, 255, 0.92); color: #211d14; }
+.qd-grid-pop .qd-tool { color: var(--qd-ink); }
+.qd-grid-pop .qd-tool.on { background: var(--qd-on-bg); color: var(--qd-on-ink); }
 
 .qd-style-pop { width: 196px; }
 .qd-row { display: flex; align-items: center; justify-content: space-between; }
-.qd-row + .qd-row { margin-top: 7px; padding-top: 7px; border-top: 1px solid rgba(255, 255, 255, 0.1); }
+.qd-row + .qd-row { margin-top: 7px; padding-top: 7px; border-top: 1px solid var(--qd-menu-div); }
 .qd-colors { display: grid; grid-template-columns: repeat(6, 1fr); gap: 3px; }
 .qd-dot {
   width: 26px;
@@ -184,6 +236,7 @@
   justify-content: center;
   cursor: pointer;
   padding: 0;
+  transition: background 140ms ease;
 }
 .qd-dot::before {
   content: '';
@@ -191,10 +244,10 @@
   height: 15px;
   border-radius: 50%;
   background: var(--dot);
-  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.12);
+  box-shadow: 0 0 0 1px var(--qd-dot-ring);
 }
-.qd-dot:hover { background: rgba(255, 255, 255, 0.1); }
-.qd-dot.on { background: rgba(255, 255, 255, 0.22); }
+.qd-dot:hover { background: var(--qd-hover); }
+.qd-dot.on { background: var(--qd-active); }
 
 .qd-opt {
   width: 40px;
@@ -202,16 +255,17 @@
   border: none;
   border-radius: 8px;
   background: transparent;
-  color: rgba(255, 255, 255, 0.85);
+  color: var(--qd-ink);
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   padding: 0;
+  transition: background 140ms ease, color 140ms ease;
 }
 .qd-opt svg { width: 20px; height: 20px; }
-.qd-opt:hover { background: rgba(255, 255, 255, 0.1); }
-.qd-opt.on { background: rgba(255, 255, 255, 0.92); color: #211d14; }
+.qd-opt:hover { background: var(--qd-hover); }
+.qd-opt.on { background: var(--qd-on-bg); color: var(--qd-on-ink); }
 .qd-size-pip {
   width: var(--pip);
   height: var(--pip);
@@ -226,26 +280,27 @@
   gap: 10px;
   border: none;
   background: transparent;
-  color: rgba(255, 255, 255, 0.88);
+  color: var(--qd-ink-strong);
   text-align: left;
   font: 500 12.5px -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   padding: 7px 10px;
   border-radius: 8px;
   cursor: pointer;
+  transition: background 140ms ease, color 140ms ease;
 }
-.qd-menu-item:hover { background: rgba(255, 255, 255, 0.1); }
-.qd-mi-ico { display: flex; flex: 0 0 16px; color: rgba(255, 255, 255, 0.62); }
+.qd-menu-item:hover { background: var(--qd-hover); }
+.qd-mi-ico { display: flex; flex: 0 0 16px; color: var(--qd-ink-soft); }
 .qd-mi-ico svg { width: 16px; height: 16px; }
 .qd-menu-item:hover .qd-mi-ico { color: inherit; }
 .qd-mi-label { flex: 1 1 auto; white-space: nowrap; }
 .qd-mi-key {
   flex: 0 0 auto;
-  color: rgba(255, 255, 255, 0.4);
+  color: var(--qd-ink-faint);
   font-size: 11px;
   letter-spacing: 0.02em;
   font-variant-numeric: tabular-nums;
 }
-.qd-menu-div { display: block; height: 1px; margin: 5px 4px; background: rgba(255, 255, 255, 0.1); }
+.qd-menu-div { display: block; height: 1px; margin: 5px 4px; background: var(--qd-menu-div); }
 
 /* labelled rows of mutually exclusive icon buttons (grid, theme) */
 .qd-menu-row {
@@ -253,7 +308,7 @@
   align-items: center;
   gap: 10px;
   padding: 4px 10px 4px 10px;
-  color: rgba(255, 255, 255, 0.88);
+  color: var(--qd-ink-strong);
   font: 500 12.5px -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 }
 .qd-menu-row + .qd-menu-row { margin-top: 2px; }
@@ -262,7 +317,8 @@
   gap: 2px;
   padding: 2px;
   border-radius: 9px;
-  background: rgba(255, 255, 255, 0.08);
+  background: var(--qd-seg-bg);
+  transition: background 320ms ease;
 }
 .qd-seg-btn {
   width: 30px;
@@ -270,7 +326,7 @@
   border: none;
   border-radius: 7px;
   background: transparent;
-  color: rgba(255, 255, 255, 0.72);
+  color: var(--qd-ink);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -279,16 +335,16 @@
   transition: background 120ms ease, color 120ms ease;
 }
 .qd-seg-btn svg { width: 16px; height: 16px; }
-.qd-seg-btn:hover { background: rgba(255, 255, 255, 0.12); color: #fff; }
-.qd-seg-btn.on { background: rgba(255, 255, 255, 0.92); color: #211d14; }
+.qd-seg-btn:hover { background: var(--qd-hover-strong); color: var(--qd-ink-strong); }
+.qd-seg-btn.on { background: var(--qd-on-bg); color: var(--qd-on-ink); }
 
 /* nested dropdown (grid backdrop): a flyout beside the parent row */
-.qd-mi-value { flex: 0 0 auto; color: rgba(255, 255, 255, 0.45); font-size: 11.5px; }
-.qd-mi-chev, .qd-mi-check { flex: 0 0 14px; display: flex; color: rgba(255, 255, 255, 0.4); }
+.qd-mi-value { flex: 0 0 auto; color: var(--qd-ink-faint); font-size: 11.5px; }
+.qd-mi-chev, .qd-mi-check { flex: 0 0 14px; display: flex; color: var(--qd-ink-faint); }
 .qd-mi-chev svg, .qd-mi-check svg { width: 14px; height: 14px; }
-.qd-mi-check { color: rgba(255, 255, 255, 0.85); }
+.qd-mi-check { color: var(--qd-ink); }
 .qd-has-sub { position: relative; }
-.qd-has-sub.sub-open { background: rgba(255, 255, 255, 0.1); }
+.qd-has-sub.sub-open { background: var(--qd-hover); }
 .qd-submenu {
   position: absolute;
   left: calc(100% + 2px);
@@ -298,9 +354,9 @@
   min-width: 148px;
   padding: 6px;
   border-radius: 13px;
-  background: rgba(19, 17, 13, 0.85);
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  box-shadow: 0 8px 28px rgba(10, 8, 4, 0.35);
+  background: var(--qd-pop-bg);
+  border: 1px solid var(--qd-border);
+  box-shadow: var(--qd-pop-shadow);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   animation: qd-sub-in 130ms ease;
@@ -338,7 +394,7 @@
   letter-spacing: 0.01em;
   text-decoration: none;
   -webkit-tap-highlight-color: transparent;
-  transition: color 140ms ease, background 140ms ease;
+  transition: color 320ms ease, background 140ms ease;
 }
 .qd-watermark svg { width: 14px; height: 14px; display: block; }
 .qd-watermark:hover {

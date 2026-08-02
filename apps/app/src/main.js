@@ -224,11 +224,12 @@ nameInput.addEventListener('blur', () => {
 openFile(currentFile().id)
 sizeNameInput()
 
-// Remember the theme across visits. The chrome itself is always dark glass —
-// only the browser UI tint follows the paper.
+// Remember the theme across visits; the chrome follows the board through the
+// root .dark class (the CSS variables up in index.html key off it).
 const syncTheme = () => {
   const dark = editor.theme.id === 'dark'
   localStorage.setItem(THEME_KEY, editor.theme.id)
+  document.documentElement.classList.toggle('dark', dark)
   document.querySelector('meta[name="theme-color"]')
     ?.setAttribute('content', dark ? '#1e1e1c' : '#faf8f4')
 }

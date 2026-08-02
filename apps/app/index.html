@@ -16,25 +16,53 @@
   <style>
     html, body { margin: 0; height: 100%; overscroll-behavior: none; }
     #board { position: fixed; inset: 0; }
-    /* Top-left chrome — the wordmark and the file bar share the dock's dark
-       glass, so every bar on the canvas stays dark in both themes. */
+    /* Top-left chrome — the wordmark and the file bar follow the board's
+       theme, same glass recipe as the dock: light glass on light paper,
+       dark glass on dark. The 320ms transitions match the board's own
+       theme crossfade so the whole switch reads as one motion. */
+    :root {
+      --bar-bg: rgba(255, 255, 255, 0.88);
+      --bar-border: rgba(28, 27, 24, 0.12);
+      --bar-shadow: 0 4px 16px rgba(28, 27, 24, 0.14);
+      --bar-ink: rgba(28, 27, 24, 0.9);
+      --bar-hover: rgba(28, 27, 24, 0.07);
+      --menu-bg: rgba(255, 255, 255, 0.94);
+      --menu-shadow: 0 8px 28px rgba(28, 27, 24, 0.2);
+      --del-ink: rgba(28, 27, 24, 0.4);
+      --del-hot: #c0392b;
+      --del-hot-bg: rgba(192, 57, 43, 0.1);
+      --current-dot: #2f6fed;
+    }
+    :root.dark {
+      --bar-bg: rgba(19, 17, 13, 0.72);
+      --bar-border: rgba(255, 255, 255, 0.14);
+      --bar-shadow: 0 4px 16px rgba(10, 8, 4, 0.25);
+      --bar-ink: rgba(255, 255, 255, 0.9);
+      --bar-hover: rgba(255, 255, 255, 0.1);
+      --menu-bg: rgba(19, 17, 13, 0.85);
+      --menu-shadow: 0 8px 28px rgba(10, 8, 4, 0.35);
+      --del-ink: rgba(255, 255, 255, 0.45);
+      --del-hot: #ff7b6b;
+      --del-hot-bg: rgba(255, 123, 107, 0.14);
+      --current-dot: #6285f5;
+    }
     .qd-app-logo {
       position: fixed; left: 10px; top: 10px; z-index: 60;
       display: flex; align-items: center; gap: 8px;
       font: 700 15.5px/1 ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
       letter-spacing: -0.01em;
-      color: rgba(255, 255, 255, 0.92); text-decoration: none;
+      color: var(--bar-ink); text-decoration: none;
       padding: 8px 14px 8px 11px; border-radius: 999px;
-      background: rgba(19, 17, 13, 0.72);
-      border: 1px solid rgba(255, 255, 255, 0.14);
-      box-shadow: 0 4px 16px rgba(10, 8, 4, 0.25);
+      background: var(--bar-bg);
+      border: 1px solid var(--bar-border);
+      box-shadow: var(--bar-shadow);
       backdrop-filter: blur(10px);
       -webkit-backdrop-filter: blur(10px);
       -webkit-tap-highlight-color: transparent;
-      transition: background 140ms ease;
+      transition: background 320ms ease, color 320ms ease, border-color 320ms ease, box-shadow 320ms ease;
     }
     .qd-app-logo svg { width: 20px; height: 20px; display: block; }
-    .qd-app-logo:hover { background: rgba(19, 17, 13, 0.85); }
+    .qd-app-logo:hover { background: var(--bar-hover); }
 
     /* File bar — files menu, new file, and the current file's name. */
     .qd-filebar {
@@ -42,12 +70,13 @@
       display: flex; align-items: center; gap: 2px;
       padding: 4px 6px; border-radius: 999px;
       font: 500 14px/1 ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
-      color: rgba(255, 255, 255, 0.85);
-      background: rgba(19, 17, 13, 0.72);
-      border: 1px solid rgba(255, 255, 255, 0.14);
-      box-shadow: 0 4px 16px rgba(10, 8, 4, 0.25);
+      color: var(--bar-ink);
+      background: var(--bar-bg);
+      border: 1px solid var(--bar-border);
+      box-shadow: var(--bar-shadow);
       backdrop-filter: blur(10px);
       -webkit-backdrop-filter: blur(10px);
+      transition: background 320ms ease, color 320ms ease, border-color 320ms ease, box-shadow 320ms ease;
     }
     .qd-file-btn {
       appearance: none; border: none; background: transparent; color: inherit;
@@ -57,7 +86,7 @@
       transition: background 140ms ease;
     }
     .qd-file-btn svg { width: 17px; height: 17px; display: block; }
-    .qd-file-btn:hover { background: rgba(255, 255, 255, 0.1); }
+    .qd-file-btn:hover { background: var(--bar-hover); }
     .qd-file-name {
       appearance: none; border: none; background: transparent; color: inherit;
       font: inherit; font-weight: 600; letter-spacing: -0.005em;
@@ -65,17 +94,18 @@
       min-width: 40px; max-width: 200px; cursor: text;
       transition: background 140ms ease;
     }
-    .qd-file-name:hover { background: rgba(255, 255, 255, 0.08); }
-    .qd-file-name:focus { outline: none; background: rgba(255, 255, 255, 0.12); }
+    .qd-file-name:hover { background: var(--bar-hover); }
+    .qd-file-name:focus { outline: none; background: var(--bar-hover); }
     .qd-files-menu {
       position: fixed; left: 156px; top: 54px; z-index: 70;
       min-width: 230px; max-height: 60vh; overflow-y: auto;
-      background: rgba(19, 17, 13, 0.85); color: rgba(255, 255, 255, 0.88);
-      border: 1px solid rgba(255, 255, 255, 0.14); border-radius: 13px;
-      box-shadow: 0 8px 28px rgba(10, 8, 4, 0.35);
+      background: var(--menu-bg); color: var(--bar-ink);
+      border: 1px solid var(--bar-border); border-radius: 13px;
+      box-shadow: var(--menu-shadow);
       backdrop-filter: blur(12px);
       -webkit-backdrop-filter: blur(12px);
       padding: 6px;
+      transition: background 320ms ease, color 320ms ease, border-color 320ms ease, box-shadow 320ms ease;
     }
     .qd-files-menu[hidden] { display: none; }
     .qd-files-menu .qd-file-row {
@@ -83,18 +113,18 @@
       padding: 8px 10px; border-radius: 8px; cursor: pointer;
       font: 500 14px/1.2 inherit;
     }
-    .qd-file-row:hover { background: rgba(255, 255, 255, 0.1); }
+    .qd-file-row:hover { background: var(--bar-hover); }
     .qd-file-row .name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .qd-file-row.current .name { font-weight: 700; }
     .qd-file-row .dot { width: 6px; height: 6px; border-radius: 999px; background: transparent; flex: none; }
-    .qd-file-row.current .dot { background: #6285f5; }
+    .qd-file-row.current .dot { background: var(--current-dot); }
     .qd-file-row .del {
       appearance: none; border: none; background: transparent; cursor: pointer;
-      color: rgba(255, 255, 255, 0.45); border-radius: 6px; flex: none;
+      color: var(--del-ink); border-radius: 6px; flex: none;
       width: 22px; height: 22px; display: flex; align-items: center; justify-content: center;
       font: 600 14px/1 inherit; padding: 0;
     }
-    .qd-file-row .del:hover { color: #ff7b6b; background: rgba(255, 123, 107, 0.14); }
+    .qd-file-row .del:hover { color: var(--del-hot); background: var(--del-hot-bg); }
 
     @media (max-width: 560px) {
       /* the wordmark folds to its glyph so the file bar fits beside it */
