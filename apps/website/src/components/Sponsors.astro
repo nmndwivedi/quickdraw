@@ -27,15 +27,16 @@ const hasSponsors = sponsors().length > 0
 
 <style>
   /* index.astro's section rhythm is scoped to that file — restate it here.
-     The block centers on the wall's axis, like the support card above it. */
-  .sponsors { margin-top: 96px; text-align: center; }
+     Heading and lede stay left, like every other section; only the wall
+     card centers its own contents. */
+  .sponsors { margin-top: 96px; }
   h2 { font-size: clamp(26px, 4vw, 34px); line-height: 1.2; margin: 0 0 16px; letter-spacing: -0.01em; }
   .section-lede {
-    color: var(--ink-soft); max-width: 56ch; margin: 0 auto 26px;
+    color: var(--ink-soft); max-width: 62ch; margin: 0 0 26px;
     text-wrap: pretty;
   }
 
-  .sponsor-actions { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; margin-top: 22px; }
+  .sponsor-actions { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 22px; }
   .btn {
     display: inline-block; padding: 11px 22px; border-radius: 999px; font-weight: 600;
     border: 1.5px solid var(--ink); color: var(--ink); font-size: 15.5px;

@@ -86,11 +86,15 @@ const ghostsRight = [0.45, 0.2]
   }
   .wall.empty { border-style: dashed; border-width: 1.5px; padding-bottom: 34px; }
 
-  /* the ghost row scrolls out of view rather than wrapping — the fade only
-     reads as a fade while the slots stay on one line */
+  /* the ghost row runs off both edges rather than wrapping — the fade only
+     reads as a fade while the slots stay on one line. The padding/negative
+     margin pair gives the hover lift and its shadow room to breathe: overflow
+     clips at the padding edge, so the row still hides the ghosts sideways
+     without shaving the top of a lifted slot. */
   .ghost-row {
     display: flex; justify-content: center; gap: 12px;
     overflow: hidden;
+    padding: 10px 0; margin: -10px 0;
   }
   .slot {
     display: flex; align-items: center; justify-content: center; gap: 8px;

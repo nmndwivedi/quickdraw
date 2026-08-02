@@ -40,18 +40,17 @@ import { SPONSOR_URL } from '../lib/sponsors.js'
 </Base>
 
 <style>
-  /* The whole page centers on the wall's axis — it's a pitch page, not a
-     doc, so a single centered column reads more deliberate than a left rag
-     above a centered card. */
-  main { max-width: var(--max); margin: 0 auto; padding: 0 20px 60px; text-align: center; }
+  /* Headings and copy stay left, matching the rest of the site; only the
+     wall card centers its own contents. */
+  main { max-width: var(--max); margin: 0 auto; padding: 0 20px 60px; }
   section { margin-top: 72px; }
   h2 { font-size: clamp(24px, 3.6vw, 30px); line-height: 1.2; margin: 0 0 22px; letter-spacing: -0.01em; }
 
-  .hero { margin-top: 56px; max-width: 640px; margin-left: auto; margin-right: auto; }
+  .hero { margin-top: 56px; max-width: 640px; }
   h1 { font-size: clamp(32px, 5vw, 46px); line-height: 1.12; margin: 0 0 16px; letter-spacing: -0.02em; }
   .qd { color: var(--accent); }
   .lede { font-size: 17px; color: var(--ink-soft); margin: 0 0 26px; text-wrap: pretty; }
-  .actions { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
+  .actions { display: flex; gap: 12px; flex-wrap: wrap; }
   .btn {
     display: inline-block; padding: 11px 22px; border-radius: 999px; font-weight: 600;
     border: 1.5px solid var(--ink); color: var(--ink); font-size: 15.5px;
@@ -62,7 +61,7 @@ import { SPONSOR_URL } from '../lib/sponsors.js'
 
   .fine-print {
     font-size: 13.5px; color: var(--ink-soft);
-    margin: 18px auto 0; max-width: 68ch; text-wrap: pretty;
+    margin: 18px 0 0; max-width: 72ch; text-wrap: pretty;
   }
 
   @media (max-width: 460px) {
