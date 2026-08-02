@@ -1,10 +1,13 @@
 ---
 // The sponsor wall — one component, two placements:
 //
-//   <SponsorWall cap={8} toPage />   homepage: top sponsors, every link goes
-//                                    to /sponsors (the pitch page)
-//   <SponsorWall />                  /sponsors: the full wall, links go
-//                                    straight to GitHub Sponsors checkout
+//   <SponsorWall cap={8} />   homepage: top sponsors, the rest behind
+//                             "+N more →" on /sponsors
+//   <SponsorWall />           /sponsors: the full wall
+//
+// Every call to action — the "your logo" slots, the button — goes straight to
+// GitHub Sponsors from wherever it's rendered; the only link to /sponsors is
+// the overflow count, which is the one thing that page uniquely holds.
 //
 // Everything is centered on the card's axis: the empty state fades ghost
 // slots out symmetrically from the live "your logo here" slot in the middle,
@@ -17,9 +20,7 @@
 // placement promises — the copy only claims what the sync actually delivers.
 import { SPONSOR_URL, sponsors } from '../lib/sponsors.js'
 
-const { cap, toPage = false } = Astro.props
-const href = toPage ? '/sponsors/' : SPONSOR_URL
-const rel = toPage ? undefined : 'noopener'
+const { cap } = Astro.props
 
 const all = sponsors()
 const shown = cap ? all.slice(0, cap) : all
@@ -35,7 +36,7 @@ const ghostsRight = [0.45, 0.2]
   <div class="wall empty">
     <div class="ghost-row">
       {ghostsLeft.map((o) => <div class="slot ghost" style={`--o: ${o}`} aria-hidden="true"></div>)}
-      <a class="slot your-slot" href={href} rel={rel}>
+      <a class="slot your-slot" href={SPONSOR_URL} rel="noopener">
         <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
         Your logo here
       </a>
@@ -48,7 +49,7 @@ const ghostsRight = [0.45, 0.2]
         Sponsor Quickdraw today and you're on this wall tomorrow — in front of
         every developer sizing up a whiteboard SDK.
       </p>
-      <a class="btn" href={href} rel={rel}>Claim the first spot</a>
+      <a class="btn" href={SPONSOR_URL} rel="noopener">Claim the first spot</a>
     </div>
   </div>
 ) : (
@@ -66,13 +67,13 @@ const ghostsRight = [0.45, 0.2]
               </>}
         </a>
       ))}
-      <a class="slot your-slot small" href={href} rel={rel}>
+      <a class="slot your-slot small" href={SPONSOR_URL} rel="noopener">
         <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
         Your logo
       </a>
     </div>
     {overflow > 0 && (
-      <p class="more"><a href={href} rel={rel}>+ {overflow} more sponsor{overflow === 1 ? '' : 's'} →</a></p>
+      <p class="more"><a href="/sponsors/">+ {overflow} more sponsor{overflow === 1 ? '' : 's'} →</a></p>
     )}
   </div>
 )}

@@ -1,10 +1,11 @@
 ---
-// Homepage sponsors section — a teaser for the dedicated /sponsors page:
-// the top sponsors (by monthly amount) and every link pointing there. The
-// wall carries its own CTA when empty, so the extra button only appears
-// once there are sponsors and the pitch card is gone.
+// Homepage sponsors section — the top sponsors, with the rest behind the
+// wall's own "+N more →" link to /sponsors. Every call to action goes
+// straight to GitHub Sponsors. The wall carries its own CTA when empty, so
+// the extra button only appears once there are sponsors and the pitch card
+// is gone.
 import SponsorWall from './SponsorWall.astro'
-import { sponsors } from '../lib/sponsors.js'
+import { SPONSOR_URL, sponsors } from '../lib/sponsors.js'
 
 const hasSponsors = sponsors().length > 0
 ---
@@ -15,11 +16,11 @@ const hasSponsors = sponsors().length > 0
     math work. Every sponsor gets a spot on this wall.
   </p>
 
-  <SponsorWall cap={8} toPage />
+  <SponsorWall cap={8} />
 
   {hasSponsors && (
     <div class="sponsor-actions">
-      <a class="btn primary" href="/sponsors/">Become a sponsor</a>
+      <a class="btn primary" href={SPONSOR_URL} rel="noopener">Become a sponsor</a>
     </div>
   )}
 </section>
