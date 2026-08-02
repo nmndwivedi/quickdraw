@@ -233,9 +233,9 @@ see the [showcase guidelines](CONTRIBUTING.md#add-your-project-to-the-showcase))
 
 ## Sponsors
 
-Quickdraw is MIT-licensed with no paid tier — [sponsors](https://tryquickdraw.com/sponsors/)
-are what keep it that way. Gold and Silver sponsors get their logo here and on
-the website:
+Quickdraw is MIT-licensed with no paid tier — [sponsors](https://github.com/sponsors/quickdrawjs)
+are what keep it that way. Sponsors get their logo on
+[the website](https://tryquickdraw.com/sponsors/) and here:
 
 <a href="https://tryquickdraw.com/sponsors/"><i>No sponsors yet — your logo could be the first.</i></a>
 

@@ -1,21 +1,15 @@
 ---
-// The homepage sponsor wall. Three states, all handled here:
-//   0 sponsors  — ghost slots that sell the spot itself
-//   a few       — real logos plus one dashed "your logo" slot as the invite
-//   too many    — tiers are capped and the rest roll up into "+N more →",
-//                 with the full wall living at /sponsors
-import { SPONSOR_URL, byTier, activeSponsors } from '../lib/sponsors.js'
+// The homepage sponsor wall — one flat list, no tiers, no prices. Empty, it
+// sells the spot itself with ghost slots; populated, it's a simple row of
+// sponsors plus a dashed "your logo" slot as the standing invite. Overflow
+// past the cap rolls up into "+N more →" pointing at /sponsors.
+import { SPONSOR_URL, sponsors } from '../lib/sponsors.js'
 
-const gold = byTier('gold')
-const silver = byTier('silver')
-const backers = byTier('backer')
-
-const SILVER_CAP = 8
-const BACKER_CAP = 14
-const silverShown = silver.slice(0, SILVER_CAP)
-const backersShown = backers.slice(0, BACKER_CAP)
-const overflow = (silver.length - silverShown.length) + (backers.length - backersShown.length)
-const empty = activeSponsors().length === 0
+const all = sponsors()
+const CAP = 11 // with the invite slot that's two tidy rows at desktop width
+const shown = all.slice(0, CAP)
+const overflow = all.length - shown.length
+const empty = all.length === 0
 
 // The empty wall: six ghost slots fading out to the right, so the space reads
 // as "waiting for logos", not "broken".
@@ -47,48 +41,27 @@ const ghosts = [1, 0.72, 0.52, 0.36, 0.24, 0.15]
     </div>
   ) : (
     <div class="wall">
-      {gold.length > 0 && (
-        <div class="row gold-row">
-          {gold.map((s) => (
-            <a class="chip gold" href={s.url} rel="noopener sponsored" title={s.name}>
-              {s.logo
-                ? <img class="logo" src={s.logo} alt={s.name} loading="lazy" />
-                : <>{s.avatar && <img class="avatar" src={s.avatar} alt="" loading="lazy" />}<span class="chip-name">{s.name}</span></>}
-            </a>
-          ))}
-        </div>
-      )}
-      {silverShown.length > 0 && (
-        <div class="row silver-row">
-          {silverShown.map((s) => (
-            <a class="chip silver" href={s.url} rel="noopener sponsored" title={s.name}>
-              {s.logo
-                ? <img class="logo" src={s.logo} alt={s.name} loading="lazy" />
-                : <>{s.avatar && <img class="avatar" src={s.avatar} alt="" loading="lazy" />}<span class="chip-name">{s.name}</span></>}
-            </a>
-          ))}
-          <a class="slot your-slot small" href={SPONSOR_URL} rel="noopener">
-            <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
-            Your logo
+      <div class="row">
+        {shown.map((s) => (
+          <a class="chip" href={s.url} rel="noopener sponsored" title={s.name}>
+            {s.logo
+              ? <img class="logo" src={s.logo} alt={s.name} loading="lazy" />
+              : <>{s.avatar && <img class="avatar" src={s.avatar} alt="" loading="lazy" />}<span class="chip-name">{s.name}</span></>}
           </a>
-        </div>
-      )}
-      {backersShown.length > 0 && (
-        <p class="backers">
-          {backersShown.map((s, i) => (
-            <><a href={s.url} rel="noopener sponsored">{s.avatar && <img class="mini-avatar" src={s.avatar} alt="" loading="lazy" />}{s.name}</a>{i < backersShown.length - 1 ? ', ' : ''}</>
-          ))}
-        </p>
-      )}
+        ))}
+        <a class="slot your-slot small" href={SPONSOR_URL} rel="noopener">
+          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+          Your logo
+        </a>
+      </div>
       {overflow > 0 && (
-        <p class="more"><a href="/sponsors/">+ {overflow} more sponsor{overflow === 1 ? '' : 's'} →</a></p>
+        <p class="more"><a href={SPONSOR_URL} rel="noopener">+ {overflow} more sponsor{overflow === 1 ? '' : 's'} on GitHub →</a></p>
       )}
     </div>
   )}
 
   <div class="sponsor-actions">
     <a class="btn primary" href={SPONSOR_URL} rel="noopener">Become a sponsor</a>
-    <a class="btn" href="/sponsors/">See the tiers</a>
   </div>
 </section>
 
@@ -131,11 +104,11 @@ const ghosts = [1, 0.72, 0.52, 0.36, 0.24, 0.15]
   }
 
   .row { display: flex; flex-wrap: wrap; gap: 12px; align-items: stretch; }
-  .row + .row, .row + .backers, .backers + .more { margin-top: 14px; }
   .chip {
-    display: flex; align-items: center; justify-content: center;
+    display: flex; align-items: center; justify-content: center; gap: 9px;
+    height: 60px; padding: 0 20px;
     border: 1px solid var(--line); border-radius: 12px; background: #fff;
-    padding: 0 22px; text-decoration: none;
+    text-decoration: none;
     transition: border-color 140ms ease, transform 140ms ease, box-shadow 140ms ease;
   }
   .chip:hover {
@@ -143,23 +116,11 @@ const ghosts = [1, 0.72, 0.52, 0.36, 0.24, 0.15]
     border-color: color-mix(in srgb, var(--accent) 40%, var(--line));
     box-shadow: 0 12px 26px -18px rgba(28, 27, 24, 0.5);
   }
-  .chip.gold { height: 84px; min-width: 200px; gap: 12px; }
-  .chip.silver { height: 60px; min-width: 150px; gap: 9px; }
-  .chip .logo { max-height: 60%; max-width: 170px; object-fit: contain; display: block; }
-  .chip.silver .logo { max-width: 130px; }
-  .chip .avatar { border-radius: 50%; display: block; }
-  .chip.gold .avatar { width: 40px; height: 40px; }
-  .chip.silver .avatar { width: 28px; height: 28px; }
-  .chip-name { font-weight: 700; font-size: 16px; color: var(--ink); letter-spacing: -0.01em; }
-  .chip.silver .chip-name { font-size: 14.5px; }
-  .mini-avatar {
-    width: 18px; height: 18px; border-radius: 50%;
-    vertical-align: -4px; margin-right: 5px; display: inline-block;
-  }
-  .slot.small { height: 60px; min-width: 150px; flex: none; padding: 0 18px; }
+  .chip .logo { max-height: 34px; max-width: 140px; object-fit: contain; display: block; }
+  .chip .avatar { width: 28px; height: 28px; border-radius: 50%; display: block; }
+  .chip-name { font-weight: 700; font-size: 14.5px; color: var(--ink); letter-spacing: -0.01em; }
+  .slot.small { height: 60px; flex: none; padding: 0 18px; }
 
-  .backers { margin: 14px 0 0; color: var(--ink-soft); font-size: 14.5px; line-height: 1.9; }
-  .backers a { color: inherit; font-weight: 600; }
   .more { margin: 12px 0 0; font-size: 14px; }
 
   .sponsor-actions { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 22px; }
