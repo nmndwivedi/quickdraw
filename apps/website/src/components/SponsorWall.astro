@@ -1,14 +1,21 @@
 ---
-// The sponsor wall — the one component both the homepage and /sponsors render.
+// The sponsor wall — one component, two placements:
 //
-// Empty, it's the pitch: a row of ghost logo slots with a live "your logo
-// here" slot, then the founding-sponsor invite and a CTA. Populated, it's a
-// flat row of avatar chips (synced daily from GitHub Sponsors) with the
-// dashed slot as the standing invite; pass `cap` to bound the row and roll
-// the rest into "+N more on GitHub →".
+//   <SponsorWall cap={8} compact />   homepage teaser: top sponsors, every
+//                                     link goes to /sponsors (the pitch page)
+//   <SponsorWall />                   /sponsors: the full wall, links go
+//                                     straight to GitHub Sponsors checkout
+//
+// The wall simply mirrors GitHub Sponsors: active sponsors are on it, lapsed
+// ones roll off at the next daily sync, one-time donations age out when
+// GitHub stops counting them as active. No hand-kept lists, no lifetime
+// placement promises — the copy only claims what the sync actually delivers.
 import { SPONSOR_URL, sponsors } from '../lib/sponsors.js'
 
-const { cap } = Astro.props
+const { cap, compact = false } = Astro.props
+const href = compact ? '/sponsors/' : SPONSOR_URL
+const rel = compact ? undefined : 'noopener'
+
 const all = sponsors()
 const shown = cap ? all.slice(0, cap) : all
 const overflow = all.length - shown.length
@@ -21,7 +28,7 @@ const ghosts = [0.72, 0.52, 0.36, 0.24, 0.15]
 {empty ? (
   <div class="wall empty">
     <div class="ghost-grid" aria-hidden="true">
-      <a class="slot your-slot" href={SPONSOR_URL} rel="noopener">
+      <a class="slot your-slot" href={href} rel={rel}>
         <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
         Your logo here
       </a>
@@ -29,16 +36,23 @@ const ghosts = [0.72, 0.52, 0.36, 0.24, 0.15]
         <div class="slot ghost" style={`--o: ${o}`}></div>
       ))}
     </div>
-    <div class="pitch">
-      <svg class="heart" viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-7.5-4.6-9.5-9.2C1 8 3.2 4.6 6.8 4.6c2.2 0 3.9 1.2 5.2 3 1.3-1.8 3-3 5.2-3 3.6 0 5.8 3.4 4.3 7.2C19.5 16.4 12 21 12 21Z"/></svg>
-      <p class="pitch-title">Nobody's here yet.</p>
-      <p class="pitch-copy">
-        The first sponsors get the one thing money usually can't buy on a
-        sponsor wall: being first. Founding sponsors stay marked as such for
-        the life of the project.
+    {compact ? (
+      <p class="teaser-note">
+        The wall is empty — be the first on it.
+        <a href={href}>Become a sponsor →</a>
       </p>
-      <a class="btn" href={SPONSOR_URL} rel="noopener">Claim the first spot</a>
-    </div>
+    ) : (
+      <div class="pitch">
+        <svg class="heart" viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-7.5-4.6-9.5-9.2C1 8 3.2 4.6 6.8 4.6c2.2 0 3.9 1.2 5.2 3 1.3-1.8 3-3 5.2-3 3.6 0 5.8 3.4 4.3 7.2C19.5 16.4 12 21 12 21Z"/></svg>
+        <p class="pitch-title">Nobody's here yet.</p>
+        <p class="pitch-copy">
+          Sponsor Quickdraw today and you're on this wall tomorrow — and on
+          the homepage, in front of every developer sizing up a whiteboard
+          SDK. An empty wall means the first logos get all the attention.
+        </p>
+        <a class="btn" href={href} rel={rel}>Claim the first spot</a>
+      </div>
+    )}
   </div>
 ) : (
   <div class="wall">
@@ -50,13 +64,13 @@ const ghosts = [0.72, 0.52, 0.36, 0.24, 0.15]
             : <>{s.avatar && <img class="avatar" src={s.avatar} alt="" loading="lazy" />}<span class="chip-name">{s.name}</span></>}
         </a>
       ))}
-      <a class="slot your-slot small" href={SPONSOR_URL} rel="noopener">
+      <a class="slot your-slot small" href={href} rel={rel}>
         <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
         Your logo
       </a>
     </div>
     {overflow > 0 && (
-      <p class="more"><a href={SPONSOR_URL} rel="noopener">+ {overflow} more sponsor{overflow === 1 ? '' : 's'} on GitHub →</a></p>
+      <p class="more"><a href={href} rel={rel}>+ {overflow} more sponsor{overflow === 1 ? '' : 's'} →</a></p>
     )}
   </div>
 )}
@@ -66,7 +80,7 @@ const ghosts = [0.72, 0.52, 0.36, 0.24, 0.15]
     background: #fff; border: 1px solid var(--line); border-radius: var(--radius);
     padding: 26px 26px 22px;
   }
-  .wall.empty { border-style: dashed; border-width: 1.5px; padding-bottom: 34px; }
+  .wall.empty { border-style: dashed; border-width: 1.5px; }
 
   .ghost-grid {
     display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
@@ -92,11 +106,17 @@ const ghosts = [0.72, 0.52, 0.36, 0.24, 0.15]
     transform: translateY(-2px); text-decoration: none;
   }
 
-  .pitch { text-align: center; margin-top: 30px; }
+  .teaser-note {
+    margin: 16px 0 0; text-align: center;
+    color: var(--ink-soft); font-size: 14px;
+  }
+  .teaser-note a { margin-left: 6px; font-weight: 600; }
+
+  .pitch { text-align: center; margin-top: 30px; padding-bottom: 12px; }
   .heart { color: color-mix(in srgb, var(--accent) 70%, var(--ink)); margin-bottom: 6px; }
   .pitch-title { font-weight: 700; font-size: 18px; margin: 0 0 8px; color: var(--ink); }
   .pitch-copy {
-    color: var(--ink-soft); max-width: 52ch; margin: 0 auto 22px;
+    color: var(--ink-soft); max-width: 54ch; margin: 0 auto 22px;
     text-wrap: pretty; line-height: 1.6;
   }
   .btn {
@@ -108,7 +128,7 @@ const ghosts = [0.72, 0.52, 0.36, 0.24, 0.15]
   .row { display: flex; flex-wrap: wrap; gap: 12px; align-items: stretch; }
   .chip {
     display: flex; align-items: center; justify-content: center; gap: 9px;
-    height: 60px; padding: 0 20px;
+    height: 60px; padding: 0 20px; max-width: 100%;
     border: 1px solid var(--line); border-radius: 12px; background: #fff;
     text-decoration: none;
     transition: border-color 140ms ease, transform 140ms ease, box-shadow 140ms ease;
@@ -119,15 +139,17 @@ const ghosts = [0.72, 0.52, 0.36, 0.24, 0.15]
     box-shadow: 0 12px 26px -18px rgba(28, 27, 24, 0.5);
   }
   .chip .logo { max-height: 34px; max-width: 140px; object-fit: contain; display: block; }
-  .chip .avatar { width: 28px; height: 28px; border-radius: 50%; display: block; }
-  .chip-name { font-weight: 700; font-size: 14.5px; color: var(--ink); letter-spacing: -0.01em; }
+  .chip .avatar { width: 28px; height: 28px; border-radius: 50%; display: block; flex: none; }
+  .chip-name {
+    font-weight: 700; font-size: 14.5px; color: var(--ink); letter-spacing: -0.01em;
+    max-width: 20ch; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
   .slot.small { height: 60px; flex: none; padding: 0 18px; }
 
   .more { margin: 12px 0 0; font-size: 14px; }
 
   @media (max-width: 640px) {
     .wall { padding: 18px 16px 16px; }
-    .wall.empty { padding-bottom: 26px; }
     .ghost-grid { grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); }
     .slot.ghost:nth-child(n + 4) { display: none; }
     .pitch { margin-top: 22px; }
