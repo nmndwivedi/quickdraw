@@ -1,13 +1,10 @@
 ---
-// The sponsors page — a simple invite that points at GitHub Sponsors. No
-// tiers, no prices: the wall is one flat list that syncs from the GitHub
-// Sponsors API daily (see .github/workflows/sponsors.yml).
+// The sponsors page — a simple invite that points at GitHub Sponsors, and
+// the same wall component the homepage renders (uncapped here).
 import Base from '../layouts/Base.astro'
+import SponsorWall from '../components/SponsorWall.astro'
 import { GITHUB_URL } from '../consts.js'
-import { SPONSOR_URL, sponsors } from '../lib/sponsors.js'
-
-const all = sponsors()
-const empty = all.length === 0
+import { SPONSOR_URL } from '../lib/sponsors.js'
 ---
 <Base
   title="Sponsor Quickdraw — keep the whiteboard SDK MIT-licensed"
@@ -30,32 +27,7 @@ const empty = all.length === 0
 
     <section class="wall-section">
       <h2>The wall</h2>
-      {empty ? (
-        <div class="empty-wall">
-          <svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-7.5-4.6-9.5-9.2C1 8 3.2 4.6 6.8 4.6c2.2 0 3.9 1.2 5.2 3 1.3-1.8 3-3 5.2-3 3.6 0 5.8 3.4 4.3 7.2C19.5 16.4 12 21 12 21Z"/></svg>
-          <p class="empty-title">Nobody's here yet.</p>
-          <p>
-            Which means the first sponsors get the one thing money usually
-            can't buy on a sponsor wall: being first. Founding sponsors stay
-            marked as such for the life of the project.
-          </p>
-          <a class="btn primary" href={SPONSOR_URL} rel="noopener">Claim the first spot</a>
-        </div>
-      ) : (
-        <div class="row">
-          {all.map((s) => (
-            <a class="chip" href={s.url} rel="noopener sponsored" title={s.name}>
-              {s.logo
-                ? <img class="logo" src={s.logo} alt={s.name} loading="lazy" />
-                : <>{s.avatar && <img class="avatar" src={s.avatar} alt="" loading="lazy" />}<span class="chip-name">{s.name}</span></>}
-            </a>
-          ))}
-          <a class="chip your-slot" href={SPONSOR_URL} rel="noopener">
-            <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
-            Your logo
-          </a>
-        </div>
-      )}
+      <SponsorWall />
       <p class="fine-print">
         The wall syncs with <a href={SPONSOR_URL} rel="noopener">GitHub
         Sponsors</a> daily — sponsor there and you appear here automatically,
@@ -85,49 +57,10 @@ const empty = all.length === 0
   .btn.primary { background: var(--ink); color: var(--paper); }
   .btn.primary:hover { background: #000; }
 
-  .empty-wall {
-    text-align: center; background: #fff; border: 1.5px dashed var(--line);
-    border-radius: var(--radius); padding: 44px 26px;
-  }
-  .empty-wall svg { color: color-mix(in srgb, var(--accent) 70%, var(--ink)); margin-bottom: 8px; }
-  .empty-title { font-weight: 700; font-size: 18px; margin: 0 0 8px; color: var(--ink); }
-  .empty-wall p { color: var(--ink-soft); max-width: 46ch; margin: 0 auto 20px; text-wrap: pretty; }
-
-  .row { display: flex; flex-wrap: wrap; gap: 12px; }
-  .chip {
-    display: flex; align-items: center; justify-content: center; gap: 9px;
-    height: 60px; padding: 0 20px;
-    border: 1px solid var(--line); border-radius: 12px; background: #fff;
-    text-decoration: none;
-    transition: border-color 140ms ease, transform 140ms ease, box-shadow 140ms ease;
-  }
-  .chip:hover {
-    transform: translateY(-2px); text-decoration: none;
-    border-color: color-mix(in srgb, var(--accent) 40%, var(--line));
-    box-shadow: 0 12px 26px -18px rgba(28, 27, 24, 0.5);
-  }
-  .chip .logo { max-height: 34px; max-width: 140px; object-fit: contain; display: block; }
-  .chip .avatar { width: 28px; height: 28px; border-radius: 50%; display: block; }
-  .chip-name { font-weight: 700; font-size: 14.5px; color: var(--ink); letter-spacing: -0.01em; }
-  .your-slot {
-    border: 1.5px dashed color-mix(in srgb, var(--accent) 45%, transparent);
-    color: color-mix(in srgb, var(--accent) 75%, var(--ink));
-    background: color-mix(in srgb, var(--accent) 4%, transparent);
-    font-weight: 600; font-size: 13.5px;
-  }
-  .your-slot:hover {
-    background: color-mix(in srgb, var(--accent) 9%, transparent);
-    border-color: color-mix(in srgb, var(--accent) 70%, transparent);
-  }
-
   .fine-print { font-size: 13.5px; color: var(--ink-soft); margin-top: 18px; max-width: 72ch; }
 
   @media (max-width: 460px) {
     .actions { display: grid; grid-template-columns: 1fr; gap: 10px; }
     .btn { text-align: center; }
-  }
-  @media (prefers-reduced-motion: reduce) {
-    .chip { transition: none; }
-    .chip:hover { transform: none; }
   }
 </style>
