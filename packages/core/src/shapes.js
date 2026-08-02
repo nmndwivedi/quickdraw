@@ -232,6 +232,51 @@ function geoPath(shape) {
     } else {
       path.ellipse(p.w / 2, p.h / 2, Math.max(0.5, p.w / 2), Math.max(0.5, p.h / 2), 0, 0, Math.PI * 2)
     }
+  } else if (p.geo === 'cloud') {
+
+    const w = p.w
+    const h = p.h
+
+    path.moveTo(w * 0.15, h * 0.62)
+
+    path.bezierCurveTo(
+      w * 0.02, h * 0.60,
+      w * 0.02, h * 0.38,
+      w * 0.16, h * 0.35
+    )
+    path.bezierCurveTo(
+      w * 0.16, h * 0.15,
+      w * 0.36, h * 0.10,
+      w * 0.46, h * 0.20
+    )
+    path.bezierCurveTo(
+      w * 0.54, h * 0.10,
+      w * 0.74, h * 0.10,
+      w * 0.82, h * 0.32
+    )
+    path.bezierCurveTo(
+      w * 0.98, h * 0.32,
+      w * 0.98, h * 0.58,
+      w * 0.84, h * 0.60
+    )
+    path.bezierCurveTo(
+      w * 0.82, h * 0.74,
+      w * 0.66, h * 0.80,
+      w * 0.55, h * 0.75
+    )
+    path.bezierCurveTo(
+      w * 0.44, h * 0.70,
+      w * 0.28, h * 0.78,
+      w * 0.24, h * 0.68
+    )
+    path.bezierCurveTo(
+      w * 0.22, h * 0.65,
+      w * 0.18, h * 0.62,
+      w * 0.15, h * 0.62
+    )
+
+    path.closePath()
+
   } else {
     const poly = geoPolygon(p.geo, p.w, p.h)
     if (p.dash === 'draw') {

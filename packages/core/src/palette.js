@@ -109,7 +109,7 @@ export const FONTS = {
   mono: "'SF Mono', ui-monospace, Menlo, monospace",
 }
 
-export const GEO_IDS = ['rectangle', 'ellipse', 'triangle', 'diamond', 'hexagon', 'star']
+export const GEO_IDS = ['rectangle', 'ellipse', 'triangle', 'diamond', 'hexagon', 'star', 'cloud']
 
 // Highlighter: wide translucent band that multiplies into the paper.
 export const HIGHLIGHT_ALPHA = 0.55

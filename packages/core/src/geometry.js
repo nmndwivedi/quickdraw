@@ -175,6 +175,8 @@ export const geoPolygon = (geo, w, h) => {
       }
       return pts
     }
+    case 'cloud':
+      return cloudPolygon(w, h)
     case 'rectangle':
     default:
       return [0, 0, w, 0, w, h, 0, h]
@@ -188,6 +190,86 @@ export const ellipsePolygon = (w, h, n = 32) => {
     const a = (i / n) * Math.PI * 2
     pts.push(w / 2 + (Math.cos(a) * w) / 2, h / 2 + (Math.sin(a) * h) / 2)
   }
+  return pts
+}
+
+// cloud sampled as a polygon (hit-testing / selection)
+export const cloudPolygon = (w, h, steps = 12) => {
+  const pts = []
+
+  // cubic Bézier sampler
+  const bezier = (p0, p1, p2, p3) => {
+    for (let i = 0; i <= steps; i++) {
+      const t = i / steps
+      const mt = 1 - t
+
+      const x =
+        mt * mt * mt * p0.x +
+        3 * mt * mt * t * p1.x +
+        3 * mt * t * t * p2.x +
+        t * t * t * p3.x
+
+      const y =
+        mt * mt * mt * p0.y +
+        3 * mt * mt * t * p1.y +
+        3 * mt * t * t * p2.y +
+        t * t * t * p3.y
+
+      pts.push(x, y)
+    }
+  }
+
+  const p0 = { x: w * 0.15, y: h * 0.62 }
+
+  bezier(
+    p0,
+    { x: w * 0.02, y: h * 0.60 },
+    { x: w * 0.02, y: h * 0.38 },
+    { x: w * 0.16, y: h * 0.35 }
+  )
+
+  bezier(
+    { x: w * 0.16, y: h * 0.35 },
+    { x: w * 0.16, y: h * 0.15 },
+    { x: w * 0.36, y: h * 0.10 },
+    { x: w * 0.46, y: h * 0.20 }
+  )
+
+  bezier(
+    { x: w * 0.46, y: h * 0.20 },
+    { x: w * 0.54, y: h * 0.10 },
+    { x: w * 0.74, y: h * 0.10 },
+    { x: w * 0.82, y: h * 0.32 }
+  )
+
+  bezier(
+    { x: w * 0.82, y: h * 0.32 },
+    { x: w * 0.98, y: h * 0.32 },
+    { x: w * 0.98, y: h * 0.58 },
+    { x: w * 0.84, y: h * 0.60 }
+  )
+
+  bezier(
+    { x: w * 0.84, y: h * 0.60 },
+    { x: w * 0.82, y: h * 0.74 },
+    { x: w * 0.66, y: h * 0.80 },
+    { x: w * 0.55, y: h * 0.75 }
+  )
+
+  bezier(
+    { x: w * 0.55, y: h * 0.75 },
+    { x: w * 0.44, y: h * 0.70 },
+    { x: w * 0.28, y: h * 0.78 },
+    { x: w * 0.24, y: h * 0.68 }
+  )
+
+  bezier(
+    { x: w * 0.24, y: h * 0.68 },
+    { x: w * 0.22, y: h * 0.65 },
+    { x: w * 0.18, y: h * 0.62 },
+    p0
+  )
+
   return pts
 }
 
