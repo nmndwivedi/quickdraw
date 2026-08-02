@@ -51,7 +51,9 @@ const ghosts = [1, 0.72, 0.52, 0.36, 0.24, 0.15]
         <div class="row gold-row">
           {gold.map((s) => (
             <a class="chip gold" href={s.url} rel="noopener sponsored" title={s.name}>
-              {s.logo ? <img src={s.logo} alt={s.name} loading="lazy" /> : <span class="chip-name">{s.name}</span>}
+              {s.logo
+                ? <img class="logo" src={s.logo} alt={s.name} loading="lazy" />
+                : <>{s.avatar && <img class="avatar" src={s.avatar} alt="" loading="lazy" />}<span class="chip-name">{s.name}</span></>}
             </a>
           ))}
         </div>
@@ -60,7 +62,9 @@ const ghosts = [1, 0.72, 0.52, 0.36, 0.24, 0.15]
         <div class="row silver-row">
           {silverShown.map((s) => (
             <a class="chip silver" href={s.url} rel="noopener sponsored" title={s.name}>
-              {s.logo ? <img src={s.logo} alt={s.name} loading="lazy" /> : <span class="chip-name">{s.name}</span>}
+              {s.logo
+                ? <img class="logo" src={s.logo} alt={s.name} loading="lazy" />
+                : <>{s.avatar && <img class="avatar" src={s.avatar} alt="" loading="lazy" />}<span class="chip-name">{s.name}</span></>}
             </a>
           ))}
           <a class="slot your-slot small" href={SPONSOR_URL} rel="noopener">
@@ -72,7 +76,7 @@ const ghosts = [1, 0.72, 0.52, 0.36, 0.24, 0.15]
       {backersShown.length > 0 && (
         <p class="backers">
           {backersShown.map((s, i) => (
-            <><a href={s.url} rel="noopener sponsored">{s.name}</a>{i < backersShown.length - 1 ? ', ' : ''}</>
+            <><a href={s.url} rel="noopener sponsored">{s.avatar && <img class="mini-avatar" src={s.avatar} alt="" loading="lazy" />}{s.name}</a>{i < backersShown.length - 1 ? ', ' : ''}</>
           ))}
         </p>
       )}
@@ -139,12 +143,19 @@ const ghosts = [1, 0.72, 0.52, 0.36, 0.24, 0.15]
     border-color: color-mix(in srgb, var(--accent) 40%, var(--line));
     box-shadow: 0 12px 26px -18px rgba(28, 27, 24, 0.5);
   }
-  .chip.gold { height: 84px; min-width: 200px; }
-  .chip.silver { height: 60px; min-width: 150px; }
-  .chip img { max-height: 60%; max-width: 170px; object-fit: contain; display: block; }
-  .chip.silver img { max-width: 130px; }
+  .chip.gold { height: 84px; min-width: 200px; gap: 12px; }
+  .chip.silver { height: 60px; min-width: 150px; gap: 9px; }
+  .chip .logo { max-height: 60%; max-width: 170px; object-fit: contain; display: block; }
+  .chip.silver .logo { max-width: 130px; }
+  .chip .avatar { border-radius: 50%; display: block; }
+  .chip.gold .avatar { width: 40px; height: 40px; }
+  .chip.silver .avatar { width: 28px; height: 28px; }
   .chip-name { font-weight: 700; font-size: 16px; color: var(--ink); letter-spacing: -0.01em; }
   .chip.silver .chip-name { font-size: 14.5px; }
+  .mini-avatar {
+    width: 18px; height: 18px; border-radius: 50%;
+    vertical-align: -4px; margin-right: 5px; display: inline-block;
+  }
   .slot.small { height: 60px; min-width: 150px; flex: none; padding: 0 18px; }
 
   .backers { margin: 14px 0 0; color: var(--ink-soft); font-size: 14.5px; line-height: 1.9; }

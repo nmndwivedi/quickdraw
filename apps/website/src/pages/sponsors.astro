@@ -11,16 +11,16 @@ const empty = activeSponsors().length === 0
 
 const steps = [
   {
-    title: 'Pick a tier',
+    title: 'Sponsor on GitHub',
     body: 'Sponsorship runs through GitHub Sponsors — a standard GitHub checkout, monthly or one-time, with receipts and invoices handled for you.',
   },
   {
-    title: 'Send your logo',
-    body: 'Open a PR adding yourself to sponsors.js (an SVG with a transparent background works best), or just open an issue and we’ll do it for you.',
+    title: 'You appear automatically',
+    body: 'The wall syncs with GitHub Sponsors daily: your name and avatar show up here and on the homepage within a day, no PR needed.',
   },
   {
-    title: 'You’re on the wall',
-    body: 'Your logo ships with the next deploy — on this page, the homepage, and (Gold and Silver) the README on GitHub and npm.',
+    title: 'Optional: a real logo',
+    body: 'Gold and Silver sponsors can swap the avatar for a proper logo — send an SVG via issue or PR and it replaces the avatar everywhere, README included.',
   },
 ]
 ---
@@ -50,7 +50,6 @@ const steps = [
           <div class="tier" style={`--c: ${t.hue}`}>
             <div class="tier-head">
               <h3>{t.name}</h3>
-              <span class="amount">{t.amount}</span>
             </div>
             <ul>
               {t.perks.map((p) => (
@@ -60,14 +59,14 @@ const steps = [
                 </li>
               ))}
             </ul>
-            <a class="tier-cta" href={SPONSOR_URL} rel="noopener">Sponsor at {t.name} →</a>
           </div>
         ))}
       </div>
       <p class="fine-print">
-        One-time donations of any size are welcome too. Want something a tier
-        doesn't cover — a support arrangement, a feature bounty?
-        <a href={`${GITHUB_URL}/discussions`} rel="noopener">Start a discussion.</a>
+        Amounts and one-time options live on the
+        <a href={SPONSOR_URL} rel="noopener">GitHub Sponsors page</a>. Want
+        something a tier doesn't cover — a support arrangement, a feature
+        bounty? <a href={`${GITHUB_URL}/discussions`} rel="noopener">Start a discussion.</a>
       </p>
     </section>
 
@@ -94,7 +93,9 @@ const steps = [
                 <div class={`row ${t.id}`}>
                   {list.map((s) => (
                     <a class={`chip ${t.id}`} href={s.url} rel="noopener sponsored" title={s.since ? `${s.name} — sponsor since ${s.since}` : s.name}>
-                      {s.logo ? <img src={s.logo} alt={s.name} loading="lazy" /> : <span class="chip-name">{s.name}</span>}
+                      {s.logo
+                        ? <img class="logo" src={s.logo} alt={s.name} loading="lazy" />
+                        : <>{s.avatar && <img class="avatar" src={s.avatar} alt="" loading="lazy" />}<span class="chip-name">{s.name}</span></>}
                     </a>
                   ))}
                 </div>
@@ -164,14 +165,12 @@ const steps = [
   }
   .tier-head { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; margin-bottom: 10px; }
   .tier h3 { margin: 0; font-size: 18px; }
-  .amount { font-weight: 700; font-size: 15px; color: color-mix(in srgb, var(--c) 70%, var(--ink)); font-variant-numeric: tabular-nums; }
-  .tier ul { list-style: none; margin: 0 0 16px; padding: 0; flex: 1; }
+  .tier ul { list-style: none; margin: 0; padding: 0; flex: 1; }
   .tier li {
     display: flex; gap: 8px; align-items: baseline;
     color: var(--ink-soft); font-size: 14.5px; line-height: 1.5; padding: 3px 0;
   }
   .tier li svg { flex: none; color: color-mix(in srgb, var(--c) 80%, var(--ink)); position: relative; top: 1px; }
-  .tier-cta { font-weight: 600; font-size: 14.5px; }
 
   .empty-wall {
     text-align: center; background: #fff; border: 1.5px dashed var(--line);
@@ -202,7 +201,12 @@ const steps = [
   .chip.gold { height: 92px; min-width: 220px; }
   .chip.silver { height: 64px; min-width: 160px; }
   .chip.backer { height: 44px; min-width: 0; padding: 0 16px; }
-  .chip img { max-height: 60%; max-width: 180px; object-fit: contain; display: block; }
+  .chip { gap: 10px; }
+  .chip .logo { max-height: 60%; max-width: 180px; object-fit: contain; display: block; }
+  .chip .avatar { border-radius: 50%; display: block; }
+  .chip.gold .avatar { width: 44px; height: 44px; }
+  .chip.silver .avatar { width: 30px; height: 30px; }
+  .chip.backer .avatar { width: 22px; height: 22px; }
   .chip-name { font-weight: 700; color: var(--ink); letter-spacing: -0.01em; }
   .chip.gold .chip-name { font-size: 17px; }
   .chip.silver .chip-name { font-size: 15px; }

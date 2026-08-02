@@ -1,0 +1,55 @@
+name: Sponsors
+
+# Keeps docs/sponsors.json current so the website's sponsor wall features
+# sponsors automatically — new sponsors appear within a day of sponsoring,
+# lapsed ones roll off, no manual list edits.
+#
+# The Sponsors GraphQL API rejects anonymous reads, so this runs here with a
+# token. If the default Actions token can't read the org's sponsorships, add
+# a classic PAT with read:org as the SPONSORS_TOKEN secret — it's preferred
+# automatically when set.
+
+on:
+  schedule:
+    - cron: '43 4 * * *' # daily, 04:43 UTC
+  workflow_dispatch: # refresh on demand
+  push:
+    branches: [main]
+    paths:
+      - 'scripts/sponsors.mjs'
+      - '.github/workflows/sponsors.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: sponsors
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Refresh sponsors snapshot
+        env:
+          GITHUB_TOKEN: ${{ secrets.SPONSORS_TOKEN || secrets.GITHUB_TOKEN }}
+        run: node scripts/sponsors.mjs
+
+      - name: Commit if the wall changed
+        run: |
+          # Stage first: on the very first run the file is untracked, and
+          # `git diff` alone would report no change and skip the seed commit.
+          git add -A docs/sponsors.json
+          if git diff --cached --quiet; then
+            echo "No change."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "chore: update sponsors [skip ci]"
+          git push
