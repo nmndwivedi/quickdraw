@@ -1,8 +1,8 @@
 ---
 // Homepage sponsors section — a teaser for the dedicated /sponsors page:
 // the top sponsors (by monthly amount) and every link pointing there. The
-// empty wall carries its own CTA, so the extra button only appears once
-// there are sponsors and the invite line is gone.
+// wall carries its own CTA when empty, so the extra button only appears
+// once there are sponsors and the pitch card is gone.
 import SponsorWall from './SponsorWall.astro'
 import { sponsors } from '../lib/sponsors.js'
 
@@ -12,11 +12,10 @@ const hasSponsors = sponsors().length > 0
   <h2>Sponsors keep it MIT</h2>
   <p class="section-lede">
     Quickdraw has no license fees and never will — sponsors are what make that
-    math work. Every sponsor gets a spot on this wall, seen by each developer
-    who lands here.
+    math work. Every sponsor gets a spot on this wall.
   </p>
 
-  <SponsorWall cap={8} compact />
+  <SponsorWall cap={8} toPage />
 
   {hasSponsors && (
     <div class="sponsor-actions">
@@ -26,12 +25,16 @@ const hasSponsors = sponsors().length > 0
 </section>
 
 <style>
-  /* index.astro's section rhythm is scoped to that file — restate it here */
-  .sponsors { margin-top: 96px; }
-  h2 { font-size: clamp(26px, 4vw, 34px); line-height: 1.2; margin: 0 0 24px; letter-spacing: -0.01em; }
-  .section-lede { color: var(--ink-soft); max-width: 62ch; margin: -8px 0 26px; }
+  /* index.astro's section rhythm is scoped to that file — restate it here.
+     The block centers on the wall's axis, like the support card above it. */
+  .sponsors { margin-top: 96px; text-align: center; }
+  h2 { font-size: clamp(26px, 4vw, 34px); line-height: 1.2; margin: 0 0 16px; letter-spacing: -0.01em; }
+  .section-lede {
+    color: var(--ink-soft); max-width: 56ch; margin: 0 auto 26px;
+    text-wrap: pretty;
+  }
 
-  .sponsor-actions { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 22px; }
+  .sponsor-actions { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; margin-top: 22px; }
   .btn {
     display: inline-block; padding: 11px 22px; border-radius: 999px; font-weight: 600;
     border: 1.5px solid var(--ink); color: var(--ink); font-size: 15.5px;

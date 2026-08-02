@@ -1,10 +1,15 @@
 ---
 // The sponsor wall — one component, two placements:
 //
-//   <SponsorWall cap={8} compact />   homepage teaser: top sponsors, every
-//                                     link goes to /sponsors (the pitch page)
-//   <SponsorWall />                   /sponsors: the full wall, links go
-//                                     straight to GitHub Sponsors checkout
+//   <SponsorWall cap={8} toPage />   homepage: top sponsors, every link goes
+//                                    to /sponsors (the pitch page)
+//   <SponsorWall />                  /sponsors: the full wall, links go
+//                                    straight to GitHub Sponsors checkout
+//
+// Everything is centered on the card's axis: the empty state fades ghost
+// slots out symmetrically from the live "your logo here" slot in the middle,
+// and the populated row centers too, so a half-full row never reads as
+// left-over space.
 //
 // The wall simply mirrors GitHub Sponsors: active sponsors are on it, lapsed
 // ones roll off at the next daily sync, one-time donations age out when
@@ -12,47 +17,39 @@
 // placement promises — the copy only claims what the sync actually delivers.
 import { SPONSOR_URL, sponsors } from '../lib/sponsors.js'
 
-const { cap, compact = false } = Astro.props
-const href = compact ? '/sponsors/' : SPONSOR_URL
-const rel = compact ? undefined : 'noopener'
+const { cap, toPage = false } = Astro.props
+const href = toPage ? '/sponsors/' : SPONSOR_URL
+const rel = toPage ? undefined : 'noopener'
 
 const all = sponsors()
 const shown = cap ? all.slice(0, cap) : all
 const overflow = all.length - shown.length
 const empty = all.length === 0
 
-// Ghost slots fade out to the right, so the space reads as "waiting for
-// logos", not "broken".
-const ghosts = [0.72, 0.52, 0.36, 0.24, 0.15]
+// Ghosts fade away from the live slot in both directions, so the invite sits
+// at the optical center of the row.
+const ghostsLeft = [0.2, 0.45]
+const ghostsRight = [0.45, 0.2]
 ---
 {empty ? (
   <div class="wall empty">
-    <div class="ghost-grid" aria-hidden="true">
+    <div class="ghost-row">
+      {ghostsLeft.map((o) => <div class="slot ghost" style={`--o: ${o}`} aria-hidden="true"></div>)}
       <a class="slot your-slot" href={href} rel={rel}>
-        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
         Your logo here
       </a>
-      {ghosts.map((o) => (
-        <div class="slot ghost" style={`--o: ${o}`}></div>
-      ))}
+      {ghostsRight.map((o) => <div class="slot ghost" style={`--o: ${o}`} aria-hidden="true"></div>)}
     </div>
-    {compact ? (
-      <p class="teaser-note">
-        The wall is empty — be the first on it.
-        <a href={href}>Become a sponsor →</a>
+    <div class="pitch">
+      <svg class="heart" viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-7.5-4.6-9.5-9.2C1 8 3.2 4.6 6.8 4.6c2.2 0 3.9 1.2 5.2 3 1.3-1.8 3-3 5.2-3 3.6 0 5.8 3.4 4.3 7.2C19.5 16.4 12 21 12 21Z"/></svg>
+      <p class="pitch-title">Nobody's here yet.</p>
+      <p class="pitch-copy">
+        Sponsor Quickdraw today and you're on this wall tomorrow — in front of
+        every developer sizing up a whiteboard SDK.
       </p>
-    ) : (
-      <div class="pitch">
-        <svg class="heart" viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-7.5-4.6-9.5-9.2C1 8 3.2 4.6 6.8 4.6c2.2 0 3.9 1.2 5.2 3 1.3-1.8 3-3 5.2-3 3.6 0 5.8 3.4 4.3 7.2C19.5 16.4 12 21 12 21Z"/></svg>
-        <p class="pitch-title">Nobody's here yet.</p>
-        <p class="pitch-copy">
-          Sponsor Quickdraw today and you're on this wall tomorrow — and on
-          the homepage, in front of every developer sizing up a whiteboard
-          SDK. An empty wall means the first logos get all the attention.
-        </p>
-        <a class="btn" href={href} rel={rel}>Claim the first spot</a>
-      </div>
-    )}
+      <a class="btn" href={href} rel={rel}>Claim the first spot</a>
+    </div>
   </div>
 ) : (
   <div class="wall">
@@ -61,7 +58,12 @@ const ghosts = [0.72, 0.52, 0.36, 0.24, 0.15]
         <a class="chip" href={s.url} rel="noopener sponsored" title={s.name}>
           {s.logo
             ? <img class="logo" src={s.logo} alt={s.name} loading="lazy" />
-            : <>{s.avatar && <img class="avatar" src={s.avatar} alt="" loading="lazy" />}<span class="chip-name">{s.name}</span></>}
+            : <>
+                {/* a dead avatar URL drops out rather than leaving a broken
+                    glyph — the name alone still reads as a finished chip */}
+                {s.avatar && <img class="avatar" src={s.avatar} alt="" loading="lazy" onerror="this.remove()" />}
+                <span class="chip-name">{s.name}</span>
+              </>}
         </a>
       ))}
       <a class="slot your-slot small" href={href} rel={rel}>
@@ -78,17 +80,20 @@ const ghosts = [0.72, 0.52, 0.36, 0.24, 0.15]
 <style>
   .wall {
     background: #fff; border: 1px solid var(--line); border-radius: var(--radius);
-    padding: 26px 26px 22px;
+    padding: 26px 26px 24px;
+    text-align: center;
   }
-  .wall.empty { border-style: dashed; border-width: 1.5px; }
+  .wall.empty { border-style: dashed; border-width: 1.5px; padding-bottom: 34px; }
 
-  .ghost-grid {
-    display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-    gap: 12px;
+  /* the ghost row scrolls out of view rather than wrapping — the fade only
+     reads as a fade while the slots stay on one line */
+  .ghost-row {
+    display: flex; justify-content: center; gap: 12px;
+    overflow: hidden;
   }
   .slot {
     display: flex; align-items: center; justify-content: center; gap: 8px;
-    height: 64px; border-radius: 12px;
+    flex: 0 0 172px; height: 64px; border-radius: 12px;
     border: 1.5px dashed var(--line);
     color: var(--ink-soft); font-weight: 600; font-size: 13.5px;
   }
@@ -106,18 +111,12 @@ const ghosts = [0.72, 0.52, 0.36, 0.24, 0.15]
     transform: translateY(-2px); text-decoration: none;
   }
 
-  .teaser-note {
-    margin: 16px 0 0; text-align: center;
-    color: var(--ink-soft); font-size: 14px;
-  }
-  .teaser-note a { margin-left: 6px; font-weight: 600; }
-
-  .pitch { text-align: center; margin-top: 30px; padding-bottom: 12px; }
+  .pitch { margin-top: 30px; }
   .heart { color: color-mix(in srgb, var(--accent) 70%, var(--ink)); margin-bottom: 6px; }
   .pitch-title { font-weight: 700; font-size: 18px; margin: 0 0 8px; color: var(--ink); }
   .pitch-copy {
-    color: var(--ink-soft); max-width: 54ch; margin: 0 auto 22px;
-    text-wrap: pretty; line-height: 1.6;
+    color: var(--ink-soft); max-width: 50ch; margin: 0 auto 22px;
+    text-wrap: balance; line-height: 1.6;
   }
   .btn {
     display: inline-block; padding: 11px 22px; border-radius: 999px; font-weight: 600;
@@ -125,7 +124,7 @@ const ghosts = [0.72, 0.52, 0.36, 0.24, 0.15]
   }
   .btn:hover { text-decoration: none; background: #000; }
 
-  .row { display: flex; flex-wrap: wrap; gap: 12px; align-items: stretch; }
+  .row { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; }
   .chip {
     display: flex; align-items: center; justify-content: center; gap: 9px;
     height: 60px; padding: 0 20px; max-width: 100%;
@@ -144,14 +143,14 @@ const ghosts = [0.72, 0.52, 0.36, 0.24, 0.15]
     font-weight: 700; font-size: 14.5px; color: var(--ink); letter-spacing: -0.01em;
     max-width: 20ch; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
   }
-  .slot.small { height: 60px; flex: none; padding: 0 18px; }
+  .slot.small { flex: none; height: 60px; padding: 0 18px; }
 
-  .more { margin: 12px 0 0; font-size: 14px; }
+  .more { margin: 14px 0 0; font-size: 14px; }
 
   @media (max-width: 640px) {
-    .wall { padding: 18px 16px 16px; }
-    .ghost-grid { grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); }
-    .slot.ghost:nth-child(n + 4) { display: none; }
+    .wall { padding: 18px 16px 18px; }
+    .wall.empty { padding-bottom: 26px; }
+    .slot { flex-basis: 140px; }
     .pitch { margin-top: 22px; }
   }
   @media (prefers-reduced-motion: reduce) {
