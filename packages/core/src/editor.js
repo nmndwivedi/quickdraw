@@ -1291,6 +1291,7 @@ export class Editor {
       return
     }
     if (!meta) {
+      if (e.key === '?') { e.preventDefault(); this.emit('shortcuts'); return }
       if (k === ']') { this.bringToFront(); return }
       if (k === '[') { this.sendToBack(); return }
       const toolKeys = {

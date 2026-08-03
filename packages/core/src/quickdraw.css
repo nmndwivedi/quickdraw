@@ -209,6 +209,126 @@
   .qd-popover { animation: none; }
 }
 
+/* ---- keyboard shortcuts overlay ---- */
+.qd-shortcuts {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px;
+  background: rgba(28, 27, 24, 0.32);
+  pointer-events: auto;
+  animation: qd-fade-in 160ms ease;
+}
+.qd-root[data-qd-theme='dark'] .qd-shortcuts { background: rgba(8, 6, 3, 0.44); }
+@keyframes qd-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .qd-shortcuts { animation: none; }
+}
+
+.qd-shortcuts-panel {
+  width: min(640px, 100%);
+  max-height: calc(100% - 24px);
+  overflow: auto;
+  box-sizing: border-box;
+  padding: 14px 16px 12px;
+  border-radius: 13px;
+  background: var(--qd-pop-bg);
+  border: 1px solid var(--qd-border);
+  box-shadow: var(--qd-pop-shadow);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  color: var(--qd-ink-strong);
+  font: 500 12.5px -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  transition: background 320ms ease, border-color 320ms ease, box-shadow 320ms ease;
+  animation: qd-pop-in 160ms cubic-bezier(0.2, 0.9, 0.3, 1.15);
+}
+@media (prefers-reduced-motion: reduce) {
+  .qd-shortcuts-panel { animation: none; }
+}
+
+.qd-shortcuts-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+.qd-shortcuts-title {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.2;
+  color: var(--qd-ink-strong);
+}
+.qd-shortcuts-close {
+  width: 28px;
+  height: 28px;
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--qd-ink-soft);
+  cursor: pointer;
+  padding: 0;
+  transition: background 140ms ease, color 140ms ease;
+}
+.qd-shortcuts-close:hover { background: var(--qd-hover); color: var(--qd-ink-strong); }
+.qd-shortcuts-close svg { width: 16px; height: 16px; display: block; }
+
+.qd-shortcuts-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 2px 20px;
+}
+.qd-shortcuts-group { min-width: 0; }
+.qd-shortcuts-group-title {
+  margin: 8px 0 3px;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--qd-ink-faint);
+}
+.qd-shortcuts-list { list-style: none; margin: 0; padding: 0; }
+.qd-shortcuts-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  min-width: 0;
+  padding: 4px 0;
+}
+.qd-shortcuts-keys {
+  flex: 0 0 auto;
+  padding: 2px 6px;
+  border-radius: 6px;
+  background: var(--qd-seg-bg);
+  border: 1px solid var(--qd-border);
+  color: var(--qd-ink);
+  font: 600 11px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  white-space: nowrap;
+}
+.qd-shortcuts-action {
+  flex: 1 1 auto;
+  min-width: 0;
+  text-align: right;
+  color: var(--qd-ink-soft);
+}
+.qd-shortcuts-note {
+  margin: 10px 0 0;
+  font-size: 11px;
+  color: var(--qd-ink-faint);
+}
+/* narrow boards drop the cheat sheet to one column */
+@container (max-width: 540px) {
+  .qd-shortcuts-grid { grid-template-columns: 1fr; }
+}
+
 /* every popover tool icon needs the explicit size — an unsized svg falls back
    to its intrinsic 300×150 and overflows the 32px button (invisible on iOS) */
 .qd-popover .qd-tool svg { width: 19px; height: 19px; display: block; }

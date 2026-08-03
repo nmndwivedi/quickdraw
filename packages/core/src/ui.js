@@ -49,6 +49,7 @@ const ICONS = {
   chevronLeft: SVG('<path d="m15 18-6-6 6-6"/>'),
   sun: SVG('<circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/>'),
   moon: SVG('<path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/>'),
+  close: SVG('<path d="M18 6 6 18"/><path d="m6 6 12 12"/>'),
 }
 // the action bar wears the same glyphs the menu already uses
 ICONS.duplicate = ICONS.copy
@@ -90,6 +91,60 @@ const TIPS = {
   tools: 'Tools', duplicate: 'Duplicate — ⌘D', delete: 'Delete — ⌫',
 }
 
+// the same shortcuts the README publishes, surfaced in-app
+const SHORTCUTS = [
+  {
+    title: 'Tools',
+    rows: [
+      ['V / 1', 'Select'],
+      ['H', 'Hand (or hold Space)'],
+      ['D / P / B', 'Draw'],
+      ['I', 'Highlight'],
+      ['E', 'Eraser'],
+      ['K', 'Laser'],
+      ['A', 'Arrow'],
+      ['L', 'Line'],
+      ['G', 'Shape'],
+      ['R / O', 'Rectangle / Ellipse'],
+      ['T', 'Text'],
+      ['N', 'Sticky note'],
+    ],
+  },
+  {
+    title: 'Editing',
+    rows: [
+      ['⌘Z / ⇧⌘Z', 'Undo / redo'],
+      ['⌘A', 'Select all'],
+      ['⌘C / ⌘X / ⌘V', 'Copy / cut / paste'],
+      ['⌘D', 'Duplicate'],
+      ['⌫', 'Delete selection'],
+      ['⇧⌘⌫', 'Clear board (undoable)'],
+      ['Enter', 'Edit selected text'],
+      ['Esc', 'Done / clear selection'],
+    ],
+  },
+  {
+    title: 'Arranging',
+    rows: [
+      [']', 'Bring to front'],
+      ['[', 'Send to back'],
+      ['Arrows', 'Nudge selection'],
+      ['Shift + Arrows', 'Nudge farther'],
+    ],
+  },
+  {
+    title: 'Camera',
+    rows: [
+      ['⇧1', 'Zoom to fit'],
+      ['⇧0', 'Reset zoom to 100%'],
+      ['⌘+ / ⌘−', 'Zoom in / out'],
+      ['Scroll', 'Pan (trackpad)'],
+      ['⌘ + Wheel', 'Zoom'],
+      ['Pinch', 'Zoom'],
+    ],
+  },
+]
+
 // dock buttons in visual order (styles/more/menu ride at the end, always)
 const DOCK_NAMES = ['select', 'hand', 'draw', 'highlight', 'eraser', 'laser', 'line', 'arrow', 'geo', 'text', 'note', 'image']
 // what gives way first as the frame narrows (select and draw never yield)
@@ -110,6 +165,7 @@ export function buildUI(editor, { hidden = false, onSave, themeToggle = true, gr
   const openPopover = (name, build, anchor) => {
     if (popover?.name === name) return closePopover()
     closePopover()
+    closeShortcuts()
     const p = el('div', 'qd-popover')
     build(p)
     ui.appendChild(p)
@@ -123,6 +179,63 @@ export function buildUI(editor, { hidden = false, onSave, themeToggle = true, gr
       left = Math.max(8, Math.min(left, rr.width - pw - 8))
       p.style.left = left + 'px'
     })
+    refresh()
+  }
+
+  // ---- keyboard shortcuts overlay ----------------------------------------
+  // `?` is a board command, not a document key: the editor emits `shortcuts`
+  // and this overlay owns discoverability. It lives inside qd-ui so hosts
+  // that hide the chrome never see it.
+  let shortcutsEl = null
+  const closeShortcuts = () => {
+    if (!shortcutsEl) return
+    shortcutsEl.remove()
+    shortcutsEl = null
+    refresh()
+  }
+  const toggleShortcuts = () => {
+    if (shortcutsEl) return closeShortcuts()
+    if (ui.classList.contains('qd-hidden')) return
+    closePopover()
+    const p = el('div', 'qd-shortcuts')
+    p.setAttribute('role', 'dialog')
+    p.setAttribute('aria-modal', 'true')
+    p.setAttribute('aria-label', 'Keyboard shortcuts')
+    const panel = el('div', 'qd-shortcuts-panel')
+    const head = el('div', 'qd-shortcuts-head')
+    const title = el('h2', 'qd-shortcuts-title')
+    title.textContent = 'Keyboard shortcuts'
+    const closeBtn = el('button', 'qd-shortcuts-close')
+    closeBtn.innerHTML = ICONS.close
+    closeBtn.setAttribute('aria-label', 'Close keyboard shortcuts')
+    closeBtn.addEventListener('click', (e) => { e.stopPropagation(); closeShortcuts() })
+    head.append(title, closeBtn)
+    const grid = el('div', 'qd-shortcuts-grid')
+    for (const group of SHORTCUTS) {
+      const g = el('section', 'qd-shortcuts-group')
+      const h = el('h3', 'qd-shortcuts-group-title')
+      h.textContent = group.title
+      g.appendChild(h)
+      const list = el('ul', 'qd-shortcuts-list')
+      for (const [keys, action] of group.rows) {
+        const li = el('li', 'qd-shortcuts-row')
+        const k = el('kbd', 'qd-shortcuts-keys')
+        k.textContent = keys
+        const a = el('span', 'qd-shortcuts-action')
+        a.textContent = action
+        li.append(k, a)
+        list.appendChild(li)
+      }
+      g.appendChild(list)
+      grid.appendChild(g)
+    }
+    const foot = el('p', 'qd-shortcuts-note')
+    foot.textContent = 'On Windows and Linux, ⌘ is Ctrl.'
+    panel.append(head, grid, foot)
+    p.appendChild(panel)
+    ui.appendChild(p)
+    shortcutsEl = p
+    closeBtn.focus()
     refresh()
   }
 
@@ -494,13 +607,30 @@ export function buildUI(editor, { hidden = false, onSave, themeToggle = true, gr
     editor.on('selection', refresh),
     editor.on('theme', refresh),
     editor.on('grid', refresh),
+    editor.on('shortcuts', toggleShortcuts),
   ]
 
-  // popovers close when the pointer goes to the canvas
-  const closeOnCanvas = (e) => { if (!ui.contains(e.target)) closePopover() }
+  // popovers close when the pointer goes to the canvas; the cheat sheet also
+  // closes on its dimmed backdrop so clicking outside the panel dismisses it
+  const closeOnCanvas = (e) => {
+    if (shortcutsEl && (e.target === shortcutsEl || !shortcutsEl.contains(e.target))) closeShortcuts()
+    if (!ui.contains(e.target)) closePopover()
+  }
   root.addEventListener('pointerdown', closeOnCanvas, { capture: true })
+  const onKeyDown = (e) => {
+    if (shortcutsEl && e.key === 'Escape') {
+      e.preventDefault()
+      closeShortcuts()
+    }
+  }
+  // document-level so Escape still dismisses when focus sits outside the
+  // board (host chrome, the theme toggle, etc.)
+  document.addEventListener('keydown', onKeyDown)
 
-  const setHidden = (h) => ui.classList.toggle('qd-hidden', !!h)
+  const setHidden = (h) => {
+    ui.classList.toggle('qd-hidden', !!h)
+    if (h) closeShortcuts()
+  }
   setHidden(hidden)
   refresh()
 
@@ -516,6 +646,7 @@ export function buildUI(editor, { hidden = false, onSave, themeToggle = true, gr
       offs.forEach((f) => f())
       ro.disconnect()
       root.removeEventListener('pointerdown', closeOnCanvas, { capture: true })
+      document.removeEventListener('keydown', onKeyDown)
       ui.remove()
     },
   }
