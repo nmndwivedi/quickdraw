@@ -651,4 +651,48 @@ describe('createQuickdraw UI', () => {
     board.destroy()
     c2.remove()
   })
+
+  it('? toggles the shortcut overlay; Esc, close, and ? close it', () => {
+    const c2 = document.createElement('div')
+    document.body.appendChild(c2)
+    const board = createQuickdraw({ container: c2 })
+    const key = (k) =>
+      c2.dispatchEvent(new window.KeyboardEvent('keydown', { key: k, bubbles: true, cancelable: true }))
+
+    expect(c2.querySelector('.qd-shortcuts')).toBeNull()
+    key('?')
+    const overlay = c2.querySelector('.qd-shortcuts')
+    expect(overlay).toBeTruthy()
+    expect(overlay.textContent).toContain('Undo / redo')
+    expect(overlay.textContent).toContain('Zoom to fit')
+    expect(overlay.getAttribute('role')).toBe('dialog')
+
+    key('?')
+    expect(c2.querySelector('.qd-shortcuts')).toBeNull()
+    key('?')
+    expect(c2.querySelector('.qd-shortcuts')).toBeTruthy()
+    key('Escape')
+    expect(c2.querySelector('.qd-shortcuts')).toBeNull()
+
+    key('?')
+    c2.querySelector('.qd-shortcuts-close').click()
+    expect(c2.querySelector('.qd-shortcuts')).toBeNull()
+
+    key('?')
+    const overlay2 = c2.querySelector('.qd-shortcuts')
+    overlay2.dispatchEvent(new window.MouseEvent('pointerdown', { bubbles: true, cancelable: true }))
+    expect(c2.querySelector('.qd-shortcuts')).toBeNull()
+    board.destroy()
+    c2.remove()
+  })
+
+  it('hideUi hosts never see the shortcut overlay', () => {
+    const c2 = document.createElement('div')
+    document.body.appendChild(c2)
+    const board = createQuickdraw({ container: c2, hideUi: true })
+    c2.dispatchEvent(new window.KeyboardEvent('keydown', { key: '?', bubbles: true, cancelable: true }))
+    expect(c2.querySelector('.qd-shortcuts')).toBeNull()
+    board.destroy()
+    c2.remove()
+  })
 })
